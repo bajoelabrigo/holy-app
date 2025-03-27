@@ -1,23 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios";
 import { useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
 import FriendRequest from "../components/FriendRequest";
 import { UserPlus } from "lucide-react";
 import UserCard from "../components/UserCard";
+import { useConnectionRequest } from "../../hooks/useConnectionRequest";
 
 const NetworkPage = () => {
   const { user } = useSelector((state) => state.auth);
 
-  const { data: connectionRequest } = useQuery({
-    queryKey: ["connectionRequest"],
-    queryFn: () => axiosInstance.get("/connections/request"),
-  });
-
-  const { data: connections } = useQuery({
-    queryKey: ["connections"],
-    queryFn: () => axiosInstance.get("/connections"),
-  });
+  const { connectionRequest, connections } = useConnectionRequest();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

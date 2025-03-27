@@ -12,7 +12,7 @@ import Profile from "./pages/profile/Profile";
 import SettingsPage from "./pages/SettingsPage";
 import UserList from "./pages/userlist/UserList";
 import { useThemeStore } from "./store/useThemeStore";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -29,6 +29,7 @@ import PostPage from "./pages/PostPage";
 import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import NotificationsPage from "./pages/NotificationPage";
+import { ErrorPage } from "./ErrorPage";
 
 axios.defaults.withCredentials = true;
 
@@ -46,29 +47,33 @@ const App = () => {
   const { theme } = useThemeStore();
   return (
     <div data-theme={theme}>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot" element={<Forgot />} />
-          <Route path="/resetPassword/:resetToken" element={<Reset />} />
-          <Route path="/loginWithCode/:email" element={<LoginWithCode />} />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="forgot" element={<Forgot />} />
+          <Route path="resetPassword/:resetToken" element={<Reset />} />
+          <Route path="loginWithCode/:email" element={<LoginWithCode />} />
 
-          <Route path="/verify/:verificationToken" element={<Verify />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/changePassword" element={<ChangePassword />} />
-          <Route path="/users" element={<UserList />} />
+          <Route path="verify/:verificationToken" element={<Verify />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="changePassword" element={<ChangePassword />} />
+          <Route path="users" element={<UserList />} />
 
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/network" element={<NetworkPage />} />
-          <Route path="/post/:postId" element={<PostPage />} />
-          <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="network" element={<NetworkPage />} />
+          <Route path="post/:postId" element={<PostPage />} />
+          <Route path="profile/:username" element={<ProfilePage />} />
+
+          <Route path="not_found" element={<ErrorPage />} />
+          <Route path="*" element={<Navigate to="/not_found" />} />
+        </Route>
           <Route path="/chat" element={<ChatPage />} />
-        </Routes>
-        <ToastContainer />
-      </Layout>
+      </Routes>
+      <ToastContainer />
+
       <Toaster />
     </div>
   );

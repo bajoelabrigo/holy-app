@@ -1,7 +1,9 @@
 import { axiosInstance } from "../src/lib/axios";
 
-export const getPosts = async () => {
-  const res = await axiosInstance.get("/posts");
+export const getPosts = async ({ filterKey }) => {
+  const filterUrl = filterKey ? `content=${filterKey}` : "";
+
+  const res = await axiosInstance.get(`/posts?${filterUrl}`);
   return res.data;
 };
 

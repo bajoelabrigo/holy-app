@@ -1,29 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { axiosInstance } from "../lib/axios";
+import { useConnectionRequest } from "../../hooks/useConnectionRequest";
 
 const UserCard = ({ user, isConnection }) => {
-  const queryClient = useQueryClient();
-  const { mutate: removeConnection, isPending } = useMutation({
-    mutationFn: (userId) => axiosInstance.delete(`/connections/${userId}`),
-    onSuccess: () => {
-      toast.success("Connection remove successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["connectionRequests", user._id],
-      });
-    },
-    onError: (error) => {
-      const response =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      toast.error(response);
-    },
-  });
+  const { removeConnection, isRemovePending } = useConnectionRequest();
 
   const handleRemoveConnection = () => {
     if (!window.confirm("Are you sure you want to delete connection")) return;
@@ -54,7 +34,7 @@ const UserCard = ({ user, isConnection }) => {
         onClick={handleRemoveConnection}
         className="mt-4 bg-error text-white px-4 py-2 rounded-md hover:bg-error/80 transition-colors w-full"
       >
-        {isPending ? "Loading..." : "Remove Connection"}
+        {isRemovePending ? "Loading..." : "Remove Connection"}
       </button>
     </div>
   );

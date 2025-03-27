@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import validator from "validator";
 
 const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Please add a name"],
+      required: [true, "Please enter your name"],
     },
     username: {
       type: String,
@@ -14,18 +15,20 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Please add an email"],
-      unique: true,
+      required: [true, "Please enter your email adress"],
+      unique: [true, "This email address already exist"],
       trim: true,
-      match: [
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        "Please enter a valid email",
-      ],
+      validate: [validator.isEmail, "Please enter a valid email"],
+    },
+    status: {
+      type: String,
+      default: "Hey there ! I am using whatsapp",
     },
     profilePicture: {
       type: String,
+      required: [true, "Please add a photo"],
       default:
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+        "https://res.cloudinary.com/dkd5jblv5/image/upload/v1675976806/Default_ProfilePicture_gjngnb.png",
     },
     bannerImg: {
       type: String,
@@ -106,6 +109,7 @@ const userSchema = mongoose.Schema(
     },
   },
   {
+    collection:"users",
     timestamps: true,
     minimize: false,
   }

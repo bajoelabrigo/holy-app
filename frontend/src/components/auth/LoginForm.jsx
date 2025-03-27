@@ -2,7 +2,7 @@ import { Loader, Lock, Mail, User, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signInSchema, signUpSchema } from "../../utils/validation";
+import { signInSchema } from "../../utils/validation";
 import PasswordInput from "./PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "./Input";
@@ -39,7 +39,7 @@ const SignUpForm = () => {
   };
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
-      navigate("/profile");
+      navigate("/");
     }
     if (isError && twoFactor) {
       dispatch(sendLoginCode(email));

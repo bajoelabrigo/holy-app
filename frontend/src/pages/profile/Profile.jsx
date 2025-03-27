@@ -29,7 +29,7 @@ const Profile = () => {
     email: user?.email || "",
     phone: user?.phone || "",
     bio: user?.bio || "",
-    photo: user?.photo || "",
+    profilePicture: user?.profilePicture || "",
     role: user?.role || "",
     isVerified: user?.isVerified || false,
   };
@@ -82,7 +82,7 @@ const Profile = () => {
         username: profile.username,
         phone: profile.phone,
         bio: profile.bio,
-        photo: profileImage ? imageURL : profile.photo,
+        profilePicture: profileImage ? imageURL : profile.profilePicture,
       };
 
       dispatch(updateUser(userData));
@@ -99,7 +99,7 @@ const Profile = () => {
         username: user.username,
         email: user.email,
         phone: user.phone,
-        photo: user.photo,
+        profilePicture: user.profilePicture,
         bio: user.bio,
         role: user.role,
         isVerified: user.isVerified,
@@ -114,7 +114,7 @@ const Profile = () => {
           <div className="space-y-1">
             <figure className="">
               <img
-                src={imagePreview === null ? user?.photo : imagePreview}
+                src={imagePreview === null ? user?.profilePicture : imagePreview}
                 alt="Profileimg"
                 className="overflow-hidden object-cover rounded-xl size-40
                 "

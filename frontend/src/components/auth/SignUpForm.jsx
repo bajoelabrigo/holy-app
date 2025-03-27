@@ -39,7 +39,7 @@ const SignUpForm = () => {
 
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
-      navigate("/profile");
+      navigate("/");
     }
     dispatch(RESET());
   }, [isLoggedIn, isSuccess, dispatch, navigate]);

@@ -96,7 +96,7 @@ const Navbar = () => {
 
                 <Link
                   to="/chat"
-                  className="text-neutral flex flex-col items-center relative"
+                  className="flex flex-col items-center relative"
                 >
                   <MessageSquare size={20} />
                   <span className="text-sm hidden md:block">Messages</span>

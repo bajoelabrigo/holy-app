@@ -7,13 +7,14 @@ import PostCreation from "../../components/PostCreation";
 import { Users } from "lucide-react";
 import RecommendedUser from "../../components/RecommendedUser";
 import Post from "../../components/Posts";
+import Categories from "../../Categories";
 
 const Home = () => {
   useRedirectLoggedOutUser("/login");
 
   const { user } = useSelector((state) => state.auth);
 
-  const { recommendedUsers, posts } = usePost();
+  const { recommendedUsers, posts } = usePost({});
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -24,6 +25,8 @@ const Home = () => {
         {/*Create posts */}
         <PostCreation user={user} />
         <div>
+
+         
           {posts?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
@@ -50,6 +53,11 @@ const Home = () => {
             {recommendedUsers?.map((user) => (
               <RecommendedUser key={user._id} user={user} />
             ))}
+          </div>
+
+          <div>
+          <h2 className="font-semibold mt-8">Categories</h2>
+          <Categories/>
           </div>
         </div>
       )}

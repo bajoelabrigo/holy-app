@@ -327,7 +327,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
       email,
       password,
       username: createUsername,
-      photo: picture,
+      profilePicture: picture,
       isVerified: true,
       userAgent,
     });
@@ -352,7 +352,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
         email,
         phone,
         bio,
-        photo,
+        profilePicture,
         role,
         isVerified,
       } = newUser;
@@ -364,7 +364,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
         email,
         phone,
         bio,
-        photo,
+        profilePicture,
         role,
         isVerified,
         token,
@@ -385,7 +385,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
       secure: true,
     });
 
-    const { _id, name, username, email, phone, bio, photo, role, isVerified } =
+    const { _id, name, username, email, phone, bio, profilePicture, role, isVerified } =
       user;
 
     res.status(201).json({
@@ -395,7 +395,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
       email,
       phone,
       bio,
-      photo,
+      profilePicture,
       role,
       isVerified,
       token,
