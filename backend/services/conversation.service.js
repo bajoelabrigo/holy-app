@@ -1,4 +1,5 @@
-import ConversationModel from "../models/chat/conversationModel.js";
+import createHttpError from "http-errors";
+import ConversationModel from "../models/chat/conversationModel.js"
 import User from "../models/userModel.js";
 
 export const doesConversationExist = async (
@@ -20,39 +21,40 @@ export const doesConversationExist = async (
       .populate("latestMessage");
 
     if (!convos)
-      return res.status(404).json({ message: "conversation not exist" });
+      throw createHttpError.BadRequest("Oops...Something went wrong !");
 
     //populate message model
     convos = await User.populate(convos, {
       path: "latestMessage.sender",
-      select: "name email profilePicture status",
+      select: "name email picture status",
     });
 
     return convos[0];
   } else {
     //it's a group chat
+
     let convo = await ConversationModel.findById(isGroup)
       .populate("users admin", "-password")
       .populate("latestMessage");
 
     if (!convo)
-      return res.status(404).json({ message: "conversation not exist" });
+      throw createHttpError.BadRequest("Oops...Something went wrong !");
 
     //populate message model
     convo = await User.populate(convo, {
       path: "latestMessage.sender",
-      select: "name email profilePicture status",
+      select: "name email picture status",
     });
     return convo;
   }
 };
+
 export const createConversation = async (data) => {
   const newConvo = await ConversationModel.create(data);
   if (!newConvo)
-    return res
-      .status(400)
-      .json({ message: "There are problems creating a conversation !" });
-
+    throw createHttpError.BadRequest(
+      "There are problems creating a conversation !"
+    );
   return newConvo;
 };
 
@@ -66,10 +68,9 @@ export const populatedConversation = async (
     fieldToRemove
   );
   if (!populatedConvo)
-    return res
-      .status(400)
-      .json({ message: "There are problems populating the conversation !" });
-
+    throw createHttpError.BadRequest(
+      "There are problems populating the conversation !"
+    );
   return populatedConvo;
 };
 
@@ -85,28 +86,24 @@ export const getUserConversations = async (user_id) => {
     .then(async (results) => {
       results = await User.populate(results, {
         path: "latestMessage.sender",
-        select: "name email profilePicture status",
+        select: "name email picture status",
       });
       conversations = results;
     })
     .catch((err) => {
-      console.log(err);
-      return res
-        .status(400)
-        .json({ message: "There are problems populating the conversation !" });
+      throw createHttpError.BadRequest(
+        "There are problems populating the conversation !"
+      );
     });
 
   return conversations;
 };
 
-export const updatedLatestMessage = async (convo_id, msg, res) => {
+export const updatedLatestMessage = async (convo_id, msg) => {
   const updatedConvo = await ConversationModel.findByIdAndUpdate(convo_id, {
     latestMessage: msg, //id of messages
   });
   if (!updatedConvo)
-    return res
-      .status(400)
-      .json({ message: "There is not update message to show !" });
-
+    throw createHttpError.BadRequest("There is not update message to show");
   return updatedConvo;
 };

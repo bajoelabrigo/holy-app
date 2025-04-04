@@ -12,19 +12,17 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 
 import errorHandler from "./middlewares/errorMiddleware.js";
+import logger from "./config/logger.config.js";
+
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/media/postRoutes.js";
 import notificationRoutes from "./routes/media/notifications.js";
 import connectionRoutes from "./routes/media/connection.js";
-import conversationRoutes from "./routes/chat/conversation.route.js"
-import messagesRoutes from "./routes/chat/message.route.js"
-import logger from "./config/logger.config.js";
+import messageRoutes from "./routes/chat/messajesRoutes.js";
+import { app, server } from "./lib/socket.js";
 
 //dotenv config
 dotenv.config();
-
-//create express app
-const app = express();
 
 //Morgan
 if (process.env.NODE_ENV !== "production") {
@@ -82,17 +80,23 @@ app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/connections", connectionRoutes);
 //Chat
-app.use("/api/conversation", conversationRoutes);
-app.use("/api/messages", messagesRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Home Page");
-});
+app.use("/api/messages", messageRoutes);
 
 //Error Handler
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+
+//exit on mongo error
+mongoose.connection.on("error", (err) => {
+  logger.error(err);
+  process.exit(1);
+});
+
+//mongo debug mode
+if (process.env.NODE_ENV === "production") {
+  mongoose.set("debug", true);
+}
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -103,6 +107,6 @@ mongoose
     console.log(err);
   });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`Server is running in port ${PORT}`);
 });

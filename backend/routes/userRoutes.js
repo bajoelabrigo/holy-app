@@ -1,4 +1,5 @@
 import express from "express";
+import trimRequest from "trim-request";
 import {
   registerUser,
   loginUser,
@@ -21,8 +22,9 @@ import {
   getSuggestedConnections,
   getUserProfile,
   getPublicProfile,
-  getUsersForSidebar,
   updateProfile,
+  searchUsers,
+  checkAuth,
 } from "../controllers/userController.js";
 import {
   protect,
@@ -31,36 +33,48 @@ import {
 } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/logout", logoutUser);
-router.get("/getUser", protect, getUser);
-router.patch("/updateUser", protect, updateUser);
+router.post("/register", trimRequest.all, registerUser);
+router.post("/login", trimRequest.all, loginUser);
+router.get("/logout", trimRequest.all, logoutUser);
+router.get("/getUser", trimRequest.all, protect, getUser);
+router.patch("/updateUser", trimRequest.all, protect, updateUser);
 
-router.delete("/:id", protect, adminOnly, deleteUser);
-router.get("/getUsers", protect, authorOnly, getUsers);
-router.get("/loginStatus", loginStatus);
-router.post("/upgradeUser", protect, adminOnly, upgradeUser);
-router.post("/sendAutomatedEmail", protect, sendAutomatedEmail);
+router.delete("/:id", trimRequest.all, protect, adminOnly, deleteUser);
+router.get("/getUsers", trimRequest.all, protect, authorOnly, getUsers);
+router.get("/loginStatus", trimRequest.all, loginStatus);
+router.post("/upgradeUser", trimRequest.all, protect, adminOnly, upgradeUser);
+router.post(
+  "/sendAutomatedEmail",
+  trimRequest.all,
+  protect,
+  sendAutomatedEmail
+);
 
-router.post("/sendVerificationEmail", protect, sendVerificationEmail);
-router.patch("/verifyUser/:verificationToken", verifyUser);
+router.post(
+  "/sendVerificationEmail",
+  trimRequest.all,
+  protect,
+  sendVerificationEmail
+);
+router.patch("/verifyUser/:verificationToken", trimRequest.all, verifyUser);
 router.post("/forgotPassword", forgotPassword);
-router.patch("/resetPassword/:resetToken", resetPassword);
-router.patch("/changePassword/", protect, changePassword);
+router.patch("/resetPassword/:resetToken", trimRequest.all, resetPassword);
+router.patch("/changePassword/", trimRequest.all, protect, changePassword);
 
-router.post("/sendLoginCode/:email", sendLoginCode);
-router.post("/loginWithCode/:email", loginWithCode);
+router.post("/sendLoginCode/:email", trimRequest.all, sendLoginCode);
+router.post("/loginWithCode/:email", trimRequest.all, loginWithCode);
 
-router.post("/google/callback", loginWithGoogle);
+router.post("/google/callback", trimRequest.all, loginWithGoogle);
 
 //!Linkedin Clone
-router.get("/profile/:username", getUserProfile);
-router.get("/suggestions", protect, getSuggestedConnections);
-router.get("/:username", protect, getPublicProfile);
+router.get("/profile/:username", trimRequest.all, getUserProfile);
+router.get("/suggestions", trimRequest.all, protect, getSuggestedConnections);
+router.get("/:username", trimRequest.all, protect, getPublicProfile);
 
-router.get("/", protect, getUsersForSidebar);
+router.put("/profile", trimRequest.all, protect, updateProfile);
 
-router.put("/profile", protect, updateProfile);
+router.get("/", trimRequest.all, protect, searchUsers);
+
+router.get("/check", trimRequest.all, protect, checkAuth);
 
 export default router;

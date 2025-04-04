@@ -16,13 +16,13 @@ const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
   const { data: connectionStatus, refetch: refetchConnectionStatus } = useQuery(
     {
       queryKey: ["connectionStatus", userData._id],
-      queryFn: () => axiosInstance.get(`/connections/status/${userData._id}`),
+      queryFn: () => axiosInstance.get(`/connections/status/${userData?._id}`),
       enabled: !isOwnProfile,
     }
   );
 
   const isConnected = userData?.connections?.some(
-    (connection) => connection === authUser._id
+    (connection) => connection === authUser?._id
   );
 
   const { mutate: sendConnectionRequest } = useMutation({

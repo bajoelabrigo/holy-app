@@ -1,4 +1,6 @@
 import express from "express";
+import trimRequest from "trim-request";
+
 import {
   protect,
   adminOnly,
@@ -16,15 +18,30 @@ import {
 
 const router = express.Router();
 
-router.post("/request/:userId", protect, sendConnectionRequest);
-router.put("/accept/:requestId", protect, acceptConnectionRequest);
-router.put("/reject/:requestId", protect, rejectConnectionRequest);
+router.post(
+  "/request/:userId",
+  trimRequest.all,
+  protect,
+  sendConnectionRequest
+);
+router.put(
+  "/accept/:requestId",
+  trimRequest.all,
+  protect,
+  acceptConnectionRequest
+);
+router.put(
+  "/reject/:requestId",
+  trimRequest.all,
+  protect,
+  rejectConnectionRequest
+);
 
 // Get all connection requests for the current user
-router.get("/request", protect, getConnectionRequests);
+router.get("/request", trimRequest.all, protect, getConnectionRequests);
 // Get all connections for a user
-router.get("/", protect, getUserConnections);
-router.delete("/:userId", protect, removeConnection);
-router.get("/status/:userId", protect, getConnectionStatus);
+router.get("/", trimRequest.all, protect, getUserConnections);
+router.delete("/:userId", trimRequest.all, protect, removeConnection);
+router.get("/status/:userId", trimRequest.all, protect, getConnectionStatus);
 
 export default router;

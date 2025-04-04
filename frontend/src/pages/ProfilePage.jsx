@@ -34,7 +34,7 @@ const ProfilePage = () => {
   if (isLoading || isUserProfileLoading) return null;
 
   const isOwnProfile = authUser?.username === userProfile?.data?.username;
-  const userData = isOwnProfile ? authUser : userProfile.data;
+  const userData = isOwnProfile ? authUser : userProfile?.data;
 
   const handleSave = (updatedData) => {
     updateProfile(updatedData);

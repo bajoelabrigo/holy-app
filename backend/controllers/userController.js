@@ -10,6 +10,7 @@ import User from "../models/userModel.js";
 import sendEmail from "../utils/sendEmail.js";
 import { OAuth2Client } from "google-auth-library";
 import cloudinary from "../lib/cloudinary.js";
+import { searchUsers as searchUsersService } from "../services/user.services.js";
 
 const cryptr = new Cryptr(`${process.env.CRYPTR_KEY}`);
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -385,8 +386,17 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
       secure: true,
     });
 
-    const { _id, name, username, email, phone, bio, profilePicture, role, isVerified } =
-      user;
+    const {
+      _id,
+      name,
+      username,
+      email,
+      phone,
+      bio,
+      profilePicture,
+      role,
+      isVerified,
+    } = user;
 
     res.status(201).json({
       _id,
@@ -953,20 +963,29 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-const getUsersForSidebar = asyncHandler(async (req, res) => {
-  const loggedInUserId = req.user._id;
-
-  const filteredUsers = await User.find({
-    _id: { $ne: loggedInUserId },
-  }).select("-password");
-
-  if (filteredUsers) {
-    res.status(200).json(filteredUsers);
-  } else {
-    res.status(500);
-    throw new Error("Error in getUserForSidebar controller");
+const searchUsers = asyncHandler(async (req, res) => {
+  try {
+    const keyword = req.query.search;
+    if (!keyword) {
+      return res
+        .status(400)
+        .json({ message: "Please add a search term first" });
+    }
+    const users = await searchUsersService(keyword, req.user.userId);
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
   }
 });
+
+const checkAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export {
   registerUser,
@@ -991,6 +1010,8 @@ export {
   getSuggestedConnections,
   getUserProfile,
   getPublicProfile,
-  getUsersForSidebar,
   updateProfile,
+  searchUsers,
+  //Chat
+  checkAuth,
 };

@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../redux/fectures/auth/authSlice";
-import filterReducer from "../redux/fectures/auth/filterSlice";
-import emailReducer from "../redux/fectures/email/emailSlice";
+import authReducer from "./fectures/auth/authSlice";
+import emailReducer from "./fectures/email/emailSlice";
+import filterReducer from "./fectures/auth/filterSlice";
 
 export const store = configureStore({
   reducer: {

@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout, RESET } from "../../redux/fectures/auth/authSlice";
 import { useNavbar } from "../../../hooks/useNavbar";
-import SettingsPage from "../../pages/SettingsPage";
+import Themes from "../themes/Themes";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -38,13 +38,13 @@ const Navbar = () => {
   const messagesLength = messages?.filter((message) => !message.read).length;
 
   return (
-    <nav className="bg-base-100 text-base-content border-base-300 shadow-md sticky top-0 z-10">
+    <nav className="bg-base-100  text-base-content border-base-300 shadow-md sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center py-3">
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="flex gap-2">
+        <div className="flex sm:justify-between justify-center items-center py-3">
+          <div className="flex items-center">
+            <Link to="/" className="gap-2 hidden sm:flex">
               <Wind size={32} className="text-gray-400" />
-              <span className="font-bold text-2xl mr-20">HolyHolyHoly</span>
+              <span className="font-bold text-2xl mr-6 ">HolyHolyHoly</span>
             </Link>
             <label className="input input-bordered  w-full items-center gap-2 hidden md:flex ">
               <input
@@ -52,11 +52,11 @@ const Navbar = () => {
                 className="flex-1 grow"
                 placeholder="Search..."
               />
-              <Search size={18} />
+              <Search size={18} className="hidden" />
             </label>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-6">
+          <div className="flex items-center gap-6  sm:gap-6">
             {user ? (
               <>
                 <Link to={"/"} className="flex flex-col items-center">
@@ -71,7 +71,7 @@ const Navbar = () => {
                   <span className="text-xs hidden md:block text-center">My Network</span>
                   {unreadConnectionRequestsCount > 0 && (
                     <span
-                      className="absolute -top-1 -right-1 md:right-4 bg-blue-500 text-white text-xs 
+                      className="absolute -top-2 -right-1 md:right-2 bg-blue-500 text-white text-xs 
 										rounded-full size-3 md:size-4 flex items-center justify-center"
                     >
                       {unreadConnectionRequestsCount}
@@ -109,42 +109,25 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link>
+             
+
+              <Themes/>
+              <Link
+                  to="/profile"
+                  className="flex flex-col items-center"
+                >
+                  <Settings size={20} />
+                  <span className="text-sm hidden md:block">Settings</span>
+                </Link>
 
                 <Link
                   to={`/profile/${user.username}`}
                   className="flex flex-col items-center"
                 >
                   <User size={20} />
-                  <span className="text-xs hidden md:block">Me</span>
+                  <span className="text-sm hidden md:block">Me</span>
                 </Link>
 
-                {/* You can open the modal using document.getElementById('ID').showModal() method */}
-
-                <div className="drawer ">
-                  <input
-                    id="my-drawer"
-                    type="checkbox"
-                    className="drawer-toggle"
-                  />
-                  <div className="drawer-content ">
-                    {/* Page content here */}
-                    <label
-                      htmlFor="my-drawer"
-                      className="flex flex-col items-center cursor-pointer"
-                    >
-                      <Settings size={20} className="text-center"/>
-                      Themes
-                    </label>
-                  </div>
-                  <div className="drawer-side">
-                    <label
-                      htmlFor="my-drawer"
-                      aria-label="close sidebar"
-                      className="drawer-overlay"
-                    ></label>
-                    <SettingsPage size={20} />
-                  </div>
-                </div>
 
                 <button
                   onClick={LogoutUser}

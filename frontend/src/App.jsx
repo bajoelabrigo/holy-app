@@ -15,7 +15,6 @@ import { useThemeStore } from "./store/useThemeStore";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getLoginStatus,
@@ -30,8 +29,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import NotificationsPage from "./pages/NotificationPage";
 import { ErrorPage } from "./ErrorPage";
-
-axios.defaults.withCredentials = true;
+import LayoutChat from "./components/layout/LayoutChat";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -70,7 +68,9 @@ const App = () => {
           <Route path="not_found" element={<ErrorPage />} />
           <Route path="*" element={<Navigate to="/not_found" />} />
         </Route>
-          <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chat" element={<LayoutChat />}>
+          <Route index element={<ChatPage />}></Route>
+        </Route>
       </Routes>
       <ToastContainer />
 
