@@ -3,8 +3,7 @@ import NoChatSelected from "./NoChatSelected";
 import MessageInput from "./MessageInput";
 import Messages from "./messages/Messages";
 import useConversation from "../../../zustand/useConversation";
-import FilesPreview from "./files/FilesPreview";
-import useSendMessage from "../../../hooks/useSendMessage";
+import FilesPreview from "./preview/files/FilesPreview";
 
 const MessageContainer = () => {
   const { selectedConversation, setSelectedConversation, files } =
@@ -15,12 +14,12 @@ const MessageContainer = () => {
   }, [setSelectedConversation]);
 
   return (
-    <div className="flex flex-col flex-1 max-w-6xl h-[calc(100vh-20rem)]">
+    <div className="flex flex-col flex-1 max-w-6xl hview">
       {!selectedConversation ? (
         <NoChatSelected />
       ) : (
         <>
-          <div className="bg-base-200  flex justify-between items-center px-4 py-2 mb-2 rounded-r-md">
+          <div className="bg-base-200 flex justify-between items-center px-4 py-2 mb-2 rounded-r-md">
             <div>
               <span className="label-text">To: </span>
               <span className=" font-bold">{selectedConversation?.name}</span>

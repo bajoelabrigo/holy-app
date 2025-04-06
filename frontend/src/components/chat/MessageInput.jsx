@@ -1,4 +1,4 @@
-import { ClipboardCheck, Paperclip, Send, Smile, X } from "lucide-react";
+import { Send, Smile, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSendMessage from "../../../hooks/useSendMessage";
 import EmojiPicker from "emoji-picker-react";
@@ -6,18 +6,18 @@ import Attachments from "./attachments/Attachments";
 
 const MessageInput = () => {
   const [message, setMessage] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
+  const [ setShowPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
 
-  const { loading, sendMessage } = useSendMessage();
+  const {  sendMessage } = useSendMessage();
   const [showEmojiPicker, setShowEmojiPicker] = useState();
   const emojiPickerRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!message) return;
-    await sendMessage(message);
+    await sendMessage({message});
     setMessage("");
   };
 

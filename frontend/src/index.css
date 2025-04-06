@@ -46,7 +46,7 @@
     border: 4px solid #00a884;
   }
   .hview {
-    height: calc(100vh - 290px);
+    height: calc(100vh - 350px);
     padding: 8px 0;
   }
   .fileThumbnail:hover .removeFileIcon {

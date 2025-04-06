@@ -17,14 +17,9 @@ const useSendMessage = () => {
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
-  const sendMessage = async (message, files = []) => {
+  const sendMessage = async ({ message, files = [] }) => {
     if (!selectedConversation || !selectedConversation._id) {
       toast.error("No conversation selected.");
-      return;
-    }
-
-    if (!message || message.trim() === "") {
-      toast.error("Cannot send an empty message.");
       return;
     }
 
@@ -33,6 +28,7 @@ const useSendMessage = () => {
       const formData = new FormData();
       formData.append("message", message);
       files.forEach((file) => formData.append("files", file));
+
       const res = await axiosInstance.post(
         `/messages/send/${selectedConversation._id}`,
         {

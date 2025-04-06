@@ -9,7 +9,7 @@ const SidebarChat = () => {
   const [searchResults, setSearchResults] = useState([]);
 
   return (
-    <aside className="w-full space-y-2 convos scrollbar">
+    <aside className="w-full space-y-2 convos h-[calc(100vh-24rem)] scrollbar">
       <SidebarHeader />
       <Notifications />
       <SearchInput

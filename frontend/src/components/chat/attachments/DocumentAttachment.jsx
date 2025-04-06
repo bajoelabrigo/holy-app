@@ -4,7 +4,7 @@ import { useRef } from "react";
 import useSendMessage from "../../../../hooks/useSendMessage";
 import useConversation from "../../../../zustand/useConversation";
 
-const PhotoAttachment = () => {
+const DocumentAttachment = () => {
   const { addFiles } = useSendMessage();
   const inputRef = useRef(null);
 
@@ -54,7 +54,7 @@ const PhotoAttachment = () => {
 
         // Cuando se haya procesado el último archivo, lo agregamos
         if (processedFiles.length === selectedFiles.length) {
-          setFiles(processedFiles);
+          setFiles((prev) => [...prev, ...processedFiles]);
           addFiles(processedFiles); // ✅ Pasamos un ARRAY, no un objeto individual
         }
       };
@@ -82,4 +82,4 @@ const PhotoAttachment = () => {
   );
 };
 
-export default PhotoAttachment;
+export default DocumentAttachment;

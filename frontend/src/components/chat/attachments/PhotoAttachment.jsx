@@ -8,7 +8,7 @@ const PhotoAttachment = () => {
   const { addFiles } = useSendMessage();
   const inputRef = useRef(null);
 
-  const { files, setFiles } = useConversation();
+  const {  setFiles } = useConversation();
 
   const imageHandler = (e) => {
     let selectedFiles = Array.from(e.target.files); // Convertimos a array
@@ -25,7 +25,7 @@ const PhotoAttachment = () => {
           "video/mp4",
           "video/mpeg",
           "video/webm",
-        ].includes(file.type) && file.size <= 1024 * 1024 * 5
+        ].includes(file.type) && file.size <= 1024 * 1024 * 10
     );
 
     if (selectedFiles.length === 0) {
@@ -46,14 +46,12 @@ const PhotoAttachment = () => {
 
         // Cuando se haya procesado el último archivo, lo agregamos
         if (processedFiles.length === selectedFiles.length) {
-          setFiles(processedFiles);
+          setFiles((prev) => [...prev, ...processedFiles]);
           addFiles(processedFiles); // ✅ Pasamos un ARRAY, no un objeto individual
         }
       };
     });
   };
-
-
 
   return (
     <div>

@@ -1,6 +1,6 @@
 import { Camera, Clapperboard, User } from "lucide-react";
 import PhotoAttachment from "./PhotoAttachment";
-import DocumentAttachment from "./DocumentAttachment";
+import DocumentAttachment from "./DocumentAttachment"
 
 const MenuAttachment = () => {
   return (

@@ -6,19 +6,22 @@ import { extractTime } from "../../../utils/extractTime";
 const Message = ({ message }) => {
   const { user: authUser } = useSelector((state) => state.auth);
   const { selectedConversation } = useConversation();
-  const fromMe = message.senderId === authUser?._id;
+
+  const fromMe =
+    String(message.senderId?._id || message.senderId) === String(authUser?._id);
+    
   const formattedTime = extractTime(message?.createdAt);
-  
+
   const chatClassName = fromMe ? "chat chat-end" : "chat chat-start";
   const profilePic = fromMe
-    ? authUser?.profilePicture || "/avatar.png"
+    ? authUser.profilePicture || "/avatar.png"
     : selectedConversation?.profilePicture || "/avatar.png";
   const bubbleBgColor = fromMe ? "bg-blue-500" : "bg-purple-500";
 
   const shakeClass = message?.shouldShake ? "shake" : "";
 
   return (
-    <div className={`chat ${chatClassName}`}>
+    <div className={`chat ${chatClassName} mb-2`}>
       <div className="chat-image avatar">
         <div className="size-10 rounded-full">
           <img src={profilePic} alt="" />
@@ -29,7 +32,7 @@ const Message = ({ message }) => {
       </div>
 
       <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
-      {formattedTime}
+        {formattedTime}
       </div>
     </div>
   );

@@ -23,12 +23,6 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-    if (!message && !files) {
-      return res.status(400).json({
-        message: "Please provide a conversation id and message body ",
-      });
-    }
-
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
     });
@@ -39,22 +33,30 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    const newMessage = new Message({
+    let newMessage;
+
+    if (!message && (!files || files.length === 0)) {
+      return res.status(400).json({
+        message: "Please provide a conversation id and message body ",
+      });
+    }
+
+    newMessage = new Message({
       senderId,
       receiverId,
       message,
       files: files || [],
     });
+    console.log(message);
 
-    if (newMessage) {
-      conversation.messages.push(newMessage._id);
-    }
+    conversation.messages.push(newMessage._id);
 
-    // await conversation.save();
-    // await newMessage.save();
-
-    // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
+
+    // 🔥 Populate sender y receiver antes de devolver
+    const populatedMessage = await Message.findById(newMessage._id)
+      .populate("senderId", "-password")
+      .populate("receiverId", "-password");
 
     // SOCKET IO FUNCTIONALITY WILL GO HERE
     const receiverSocketId = getReceiverSocketId(receiverId);
@@ -77,7 +79,21 @@ export const getMessages = async (req, res) => {
 
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, userToChatId] },
-    }).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
+    }).populate({
+      path: "messages",
+      populate: [
+        {
+          path: "senderId",
+          select: "-password",
+        },
+        {
+          path: "receiverId",
+          select: "-password",
+        },
+      ],
+    });
+
+    // NOT REFERENCE BUT ACTUAL MESSAGES
 
     if (!conversation) return res.status(200).json([]);
 

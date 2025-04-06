@@ -47,8 +47,8 @@ const SearchInput = ({ searchLength, setSearchResults }) => {
             )}
             <input
               type="text"
-              placeholder="Search or start a new chat"
-              className="input placeholder:text-center w-full text-center"
+              placeholder="Search or start a new chat..."
+              className="input  w-full pl-12"
               onFocus={() => setShow(true)}
               onBlur={() => searchLength === 0 && setShow(false)}
               onKeyDown={(e) => handleSearch(e)}

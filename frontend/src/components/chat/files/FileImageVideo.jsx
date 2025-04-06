@@ -1,9 +1,16 @@
-import React from 'react'
 
-const FileImageVideo = () => {
+export default function FileImageVideo({ url, type }) {
   return (
-    <div>FileImageVideo</div>
-  )
+    <div className="z-20">
+      {type === "IMAGE" ? (
+        <img src={url} alt="" className="cursor-pointer rounded-md" />
+      ) : null}
+      {type === "VIDEO" ? (
+        <video src={url} controls className="cursor-pointer" />
+      ) : null}
+      {type === "AUDIO" ? (
+        <audio url={url} className="cursor-pointer" />
+      ) : null}
+    </div>
+  );
 }
-
-export default FileImageVideo
