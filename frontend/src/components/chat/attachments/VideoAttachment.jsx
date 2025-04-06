@@ -1,10 +1,10 @@
-import { Camera } from "lucide-react";
+import { Camera, Clapperboard } from "lucide-react";
 import { getFileType } from "../../../utils/file";
 import { useRef } from "react";
 import useSendMessage from "../../../../hooks/useSendMessage";
 import useConversation from "../../../../zustand/useConversation";
 
-const PhotoAttachment = () => {
+const VideoAttachment = () => {
   const { addFiles } = useSendMessage();
   const inputRef = useRef(null);
 
@@ -57,10 +57,10 @@ const PhotoAttachment = () => {
     <div>
       <button
         type="button"
-        className="bg-[#0EABF4] rounded-full p-2 cursor-pointer text-white"
+        className="bg-[#D3396D] rounded-full p-2 cursor-pointer text-white"
         onClick={() => inputRef.current.click()}
       >
-        <Camera size={32} />
+        <Clapperboard size={32} className="text-white" />
       </button>
       <input
         type="file"
@@ -74,4 +74,4 @@ const PhotoAttachment = () => {
   );
 };
 
-export default PhotoAttachment;
+export default VideoAttachment;

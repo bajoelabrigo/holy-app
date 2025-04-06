@@ -19,6 +19,7 @@ export const getFileType = (memType) => {
       return "ZIP";
     case "audio/mpeg":
     case "audio/wav":
+    case "audio/webm":
     case "audio/mp3":
       return "AUDIO";
     case "video/mp4":

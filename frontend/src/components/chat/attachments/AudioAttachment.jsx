@@ -1,10 +1,10 @@
-import { Camera } from "lucide-react";
+import { File, FileMusic } from "lucide-react";
 import { getFileType } from "../../../utils/file";
 import { useRef } from "react";
 import useSendMessage from "../../../../hooks/useSendMessage";
 import useConversation from "../../../../zustand/useConversation";
 
-const PhotoAttachment = () => {
+const AudioAttachment = () => {
   const { addFiles } = useSendMessage();
   const inputRef = useRef(null);
 
@@ -16,16 +16,9 @@ const PhotoAttachment = () => {
     // Filtramos archivos no soportados o demasiado grandes
     selectedFiles = selectedFiles.filter(
       (file) =>
-        [
-          "image/png",
-          "image/jpeg",
-          "image/gif",
-          "image/webp",
-          "image/jpg",
-          "video/mp4",
-          "video/mpeg",
-          "video/webm",
-        ].includes(file.type) && file.size <= 1024 * 1024 * 10
+        ["audio/wav", "audio/webm", "audio/mpeg", "audio/mp3"].includes(
+          file.type
+        ) && file.size <= 1024 * 1024 * 5
     );
 
     if (selectedFiles.length === 0) {
@@ -57,21 +50,21 @@ const PhotoAttachment = () => {
     <div>
       <button
         type="button"
-        className="bg-[#0EABF4] rounded-full p-2 cursor-pointer text-white"
+        className="bg-[#ff7a33b9] rounded-full p-2 cursor-pointer text-white"
         onClick={() => inputRef.current.click()}
       >
-        <Camera size={32} />
+        <FileMusic size={32} />
       </button>
       <input
         type="file"
         hidden
         multiple
         ref={inputRef}
-        accept="image/png, image/jpg, image/jpeg, image/gif, image/webp, video/mp4, video/mpeg, video/webm"
+        accept="audio/wav, audio/webm, audio/mpeg, audio/mp3"
         onChange={imageHandler}
       />
     </div>
   );
 };
 
-export default PhotoAttachment;
+export default AudioAttachment;

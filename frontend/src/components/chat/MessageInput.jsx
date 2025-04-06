@@ -3,21 +3,22 @@ import { useEffect, useRef, useState } from "react";
 import useSendMessage from "../../../hooks/useSendMessage";
 import EmojiPicker from "emoji-picker-react";
 import Attachments from "./attachments/Attachments";
+import VoiceRecorder from "../voice/VoiceRecorder";
 
 const MessageInput = () => {
   const [message, setMessage] = useState("");
-  const [ setShowPicker] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
 
-  const {  sendMessage } = useSendMessage();
+  const { sendMessage } = useSendMessage();
   const [showEmojiPicker, setShowEmojiPicker] = useState();
   const emojiPickerRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!message) return;
-    await sendMessage({message});
+    await sendMessage({ message });
     setMessage("");
   };
 
@@ -56,12 +57,16 @@ const MessageInput = () => {
         setShowAttachments={setShowAttachments}
         setShowPicker={setShowPicker}
       />
-
+      <VoiceRecorder
+        showAudioRecorder={showAudioRecorder}
+        setShowAudioRecorder={setShowAudioRecorder}
+        setShowPicker={setShowPicker}
+      />
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="flex-grow p-3 pl-24 rounded-l-3xl border-2 border-sky-500 
+        className="flex-grow p-3 pl-30 rounded-l-3xl border-2 border-sky-500 
         focus:outline-none focus:ring-2 focus:ring-gray-300"
         placeholder="Type a message..."
       />

@@ -9,6 +9,10 @@ const useSendMessage = () => {
   const { messages, setMessages, selectedConversation } = useConversation();
   const [files, setFiles] = useState([]); // Estado local para manejar archivos
 
+  const clearFiles = () => {
+    setFiles(() => []);
+  };
+
   const addFiles = (newFiles) => {
     if (!Array.isArray(newFiles)) {
       console.error("addFiles received a non-array value:", newFiles);
@@ -44,7 +48,7 @@ const useSendMessage = () => {
       setLoading(false);
     }
   };
-  return { sendMessage, loading, addFiles, files, setFiles };
+  return { sendMessage, loading, addFiles, files, setFiles, clearFiles };
 };
 
 export default useSendMessage;

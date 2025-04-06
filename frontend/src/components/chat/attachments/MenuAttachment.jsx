@@ -1,28 +1,31 @@
 import { Camera, Clapperboard, User } from "lucide-react";
 import PhotoAttachment from "./PhotoAttachment";
-import DocumentAttachment from "./DocumentAttachment"
+import DocumentAttachment from "./DocumentAttachment";
+import VideoAttachment from "./VideoAttachment";
+import { Link } from "react-router-dom";
+import AudioAttachment from "./AudioAttachment";
 
 const MenuAttachment = () => {
   return (
-    <ul className="absolute bottom-16 left-12 openEmojiAnimation space-y-4 cursor-pointer">
+    <ul className="absolute bottom-16 left-10 openEmojiAnimation space-y-4 cursor-pointer">
       <li>
-        <button
-          type="button"
-          className="bg-[#5F66CD] rounded-full p-2 cursor-pointer text-white"
-        >
-          <User size={32} />
-        </button>
+        <Link to="/profile">
+          <button
+            type="button"
+            className="bg-[#5F66CD] rounded-full p-2 cursor-pointer text-white"
+          >
+            <User size={32} />
+          </button>
+        </Link>
       </li>
       <li>
         <PhotoAttachment />
       </li>
       <li>
-        <button
-          type="button"
-          className="bg-[#D3396D] rounded-full p-2 cursor-pointer"
-        >
-          <Clapperboard size={32} className="text-white"/>
-        </button>
+        <VideoAttachment />
+      </li>
+      <li>
+        <AudioAttachment />
       </li>
       <li>
         <DocumentAttachment />

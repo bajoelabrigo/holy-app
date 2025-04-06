@@ -29,10 +29,6 @@ const DocumentAttachment = () => {
           "application/vnd.ms-excel",
 
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "audio/wav",
-          "audio/webm",
-          "audio/mpeg",
-          "audio/mp3",
         ].includes(file.type) && file.size <= 1024 * 1024 * 5
     );
 

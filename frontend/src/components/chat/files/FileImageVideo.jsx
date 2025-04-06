@@ -1,3 +1,4 @@
+import Waveform from "../../voice/WaveForm";
 
 export default function FileImageVideo({ url, type }) {
   return (
@@ -9,7 +10,7 @@ export default function FileImageVideo({ url, type }) {
         <video src={url} controls className="cursor-pointer" />
       ) : null}
       {type === "AUDIO" ? (
-        <audio url={url} className="cursor-pointer" />
+        <Waveform url={url} className="cursor-pointer" />
       ) : null}
     </div>
   );
