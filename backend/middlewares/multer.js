@@ -1,14 +1,17 @@
-import multer from 'multer';
-import path from 'path';
+import multer from "multer";
 
-// Configuración de almacenamiento de archivos con Multer
-export const storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '../uploads'); // Aquí se guardarán los archivos
+    cb(null, "../uploads"); // asegúrate de que esta carpeta exista
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Nombre único para cada archivo
-  }
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
 });
 
-export const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  // Puedes permitir todo, o hacer validaciones si quieres
+  cb(null, true); // acepta todos los archivos
+};
+
+export const upload = multer({ storage, fileFilter });

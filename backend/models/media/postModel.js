@@ -9,9 +9,7 @@ const postSchema = new mongoose.Schema(
     },
     content: { type: String },
     image: { type: String },
-    file: {
-      type: String,
-    },
+    file: [],
 
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [
