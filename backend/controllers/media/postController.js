@@ -22,21 +22,14 @@ export const createPost = async (req, res) => {
   try {
     const { content, image } = req.body;
 
-    let newPost;
+    // Validación para asegurarnos que si no hay contenido ni imagen, se devuelve un error
 
-    if (image) {
-      const imgResult = await cloudinary.uploader.upload(image);
-      newPost = new Post({
-        author: req.user._id,
-        content,
-        image: imgResult.secure_url,
-      });
-    } else {
-      newPost = new Post({
-        author: req.user._id,
-        content,
-      });
-    }
+    // Creando el nuevo post
+    const newPost = new Post({
+      author: req.user._id,
+      content,
+      image, // Image será la URL subida desde Cloudinary
+    });
 
     await newPost.save();
 

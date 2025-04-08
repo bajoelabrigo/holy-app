@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
-import { Home, UserPlus, Bell } from "lucide-react";
+import {
+  Home,
+  UserPlus,
+  Bell,
+  MessageSquare,
+  Settings2,
+  UsersRound,
+} from "lucide-react";
 
 export default function Sidebar({ user }) {
-
   const imgUrl = user?.profilePicture?.toString();
   return (
     <div className="bg-base-100 text-base-content rounded-lg shadow">
@@ -20,6 +26,9 @@ export default function Sidebar({ user }) {
             className="w-20 h-20 rounded-full mx-auto mt-[-40px] object-cover overflow-hidden"
           />
           <h2 className="text-xl font-semibold mt-2">{user?.name}</h2>
+          <button className="btn btn-primary font-semibold">
+            {user?.role}
+          </button>
         </Link>
         <p className="text-info">{user?.headline}</p>
         <p className="text-secondary text-xs">
@@ -53,6 +62,34 @@ export default function Sidebar({ user }) {
                 <Bell className="mr-2" size={20} /> Notifications
               </Link>
             </li>
+            <li>
+              <Link
+                to="/chat"
+                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
+                <MessageSquare className="mr-2" size={20} /> Messages
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/chat"
+                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
+                <Settings2 className="mr-2" size={20} /> Settings
+              </Link>
+            </li>
+            {
+              user?.role ==="admin" ? (
+                <li>
+              <Link
+                to="/users"
+                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
+                <UsersRound className="mr-2" size={20} /> List Users
+              </Link>
+            </li>
+              ):null
+            }
           </ul>
         </nav>
       </div>

@@ -23,7 +23,7 @@ export const uploadFiles = async (files) => {
     const { file, type } = f;
     formData.append("file", file);
     let res = await uploadToCloudinary(formData);
-    console.log(res)
+    console.log(res);
     uploaded.push({
       file: res,
       type: type,

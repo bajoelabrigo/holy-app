@@ -16,7 +16,7 @@ import { shortenText } from "../profile/Profile";
 import useRedirectLoggedOutUser from "../../../hooks/useRedirectLoggedOutUser";
 
 const UserList = () => {
-  useRedirectLoggedOutUser("/login")
+  useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
@@ -37,8 +37,8 @@ const UserList = () => {
 
   const confirmDelete = (id) => {
     confirmAlert({
-      title: "Delete This User",
-      message: "Are you sure to do delete this user?",
+      title: "Delete This Post",
+      message: "Are you sure to do delete this Post?",
       buttons: [
         {
           label: "Delete",
@@ -108,7 +108,7 @@ const UserList = () => {
                   const { _id, name, email, role } = user;
                   return (
                     <tr key={_id}>
-                      <td>{index + 1}</td>
+                      <td>{itemOffset + index + 1}</td>
                       <td>{shortenText(name, 8)}</td>
                       <td>{email}</td>
                       <td

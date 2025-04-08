@@ -13,13 +13,15 @@ const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
 
   const { user: authUser } = useSelector((state) => state.auth);
 
-  const { data: connectionStatus, refetch: refetchConnectionStatus } = useQuery(
-    {
-      queryKey: ["connectionStatus", userData._id],
-      queryFn: () => axiosInstance.get(`/connections/status/${userData?._id}`),
-      enabled: !isOwnProfile,
-    }
-  );
+  const {
+    data: connectionStatus,
+    refetch: refetchConnectionStatus,
+    isLoading: isLoadingConnectionStatus,
+  } = useQuery({
+    queryKey: ["connectionStatus", userData._id],
+    queryFn: () => axiosInstance.get(`/connections/status/${userData?._id}`),
+    enabled: !isOwnProfile,
+  });
 
   const isConnected = userData?.connections?.some(
     (connection) => connection === authUser?._id
@@ -295,7 +297,13 @@ const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
             </button>
           )
         ) : (
-          <div className="flex justify-center">{refetchConnectionStatus()}</div>
+          <div className="flex justify-center">
+            {isLoadingConnectionStatus ? (
+              <span className="loading loading-spinner loading-md text-neutral" />
+            ) : (
+              renderConnectionButton()
+            )}
+          </div>
         )}
       </div>
     </div>

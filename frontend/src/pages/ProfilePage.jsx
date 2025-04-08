@@ -11,6 +11,7 @@ import ProfileHeader from "../components/profile/ProfileHeader";
 import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
+
   const { username } = useParams();
   const queryClient = useQueryClient();
 

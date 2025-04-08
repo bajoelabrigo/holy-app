@@ -15,8 +15,8 @@ export default function Waveform({url}) {
     if (waveformRef.current) {
       const ws = WaveSurfer.create({
         container: waveformRef.current,
-        waveColor: "#000",
-        progressColor: "#fafafa",
+        waveColor: "#0099DD",
+        progressColor: "#F23030",
         url: url,
         renderFunction: (channels, ctx) => {
           const { width, height } = ctx.canvas;

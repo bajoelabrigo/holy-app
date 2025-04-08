@@ -107,13 +107,19 @@ const sendLoginCode = async (email) => {
 
 //!Login With Code
 const loginWithCode = async (code, email) => {
-  const response = await axiosInstance.post(`/users/loginWithCode/${email}`, code);
+  const response = await axiosInstance.post(
+    `/users/loginWithCode/${email}`,
+    code
+  );
   return response.data;
 };
 
 //!Login With Google
 const loginWithGoogle = async (userToken) => {
-  const response = await axiosInstance.post("/users/google/callback", userToken);
+  const response = await axiosInstance.post(
+    "/users/google/callback",
+    userToken
+  );
   return response.data;
 };
 

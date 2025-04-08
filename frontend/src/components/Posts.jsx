@@ -4,6 +4,8 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import {
+  Download,
+  File,
   Loader,
   MessageCircle,
   Send,
@@ -12,9 +14,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import Microlink from "@microlink/react";
 
 import PostAction from "./PostAction";
 import { useSelector } from "react-redux";
+import Waveform from "./voice/WaveForm";
+import extractLinks from "../utils/extraLinks";
+import { confirmAlert } from "react-confirm-alert";
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const Post = ({ post }) => {
   const { postId } = useParams();
@@ -33,6 +40,7 @@ const Post = ({ post }) => {
     mutationFn: async () => {
       await axiosInstance.delete(`/posts/delete/${post._id}`);
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post deleted successfully");
@@ -68,8 +76,24 @@ const Post = ({ post }) => {
   });
 
   const handleDeletePost = () => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
     deletePost();
+  };
+
+  const confirmDelete = () => {
+    confirmAlert({
+      title: "Delete This User",
+      message: "Are you sure to do delete this user?",
+      buttons: [
+        {
+          label: "Delete",
+          onClick: () => handleDeletePost(),
+        },
+        {
+          label: "Cancel",
+          onClick: () => alert("Click No"),
+        },
+      ],
+    });
   };
 
   const handleLikePost = async () => {
@@ -97,6 +121,8 @@ const Post = ({ post }) => {
     }
   };
 
+  const content = post?.content;
+  const { links, originalString } = extractLinks(content);
   return (
     <div className="bg-base-100 text-base-content rounded-lg shadow mb-4">
       <div className="p-4">
@@ -124,7 +150,7 @@ const Post = ({ post }) => {
           </div>
           {isOwner && (
             <button
-              onClick={handleDeletePost}
+              onClick={() => confirmDelete()}
               className="text-red-500 hover:text-red-700"
             >
               {isDeletingPost ? (
@@ -135,13 +161,173 @@ const Post = ({ post }) => {
             </button>
           )}
         </div>
-        <p className=" ProseMirror">{post?.content || ""}</p>
+        {links.length > 0 && (
+          <Microlink style={{ width: "100%" }} url={links[0]} />
+        )}
+        {/*Message*/}
+        <p
+          dangerouslySetInnerHTML={{ __html: originalString }}
+          className=" ProseMirror"
+        ></p>
+
+        {/* Vista previa del archivo adjunto */}
         {post?.image && (
-          <img
-            src={post?.image}
-            alt="Post content"
-            className="rounded-lg w-full mb-4"
-          />
+          <div className="mt-4">
+            {(() => {
+              const fileUrl = post?.image;
+              const extension = fileUrl.split(".").pop().toLowerCase();
+
+              if (["jpg", "jpeg", "png", "webp", "gif"].includes(extension)) {
+                return (
+                  <img
+                    src={fileUrl}
+                    alt="Adjunto"
+                    className="rounded-lg w-full mb-4"
+                  />
+                );
+              } else if (extension === "pdf") {
+                return (
+                  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md mb-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center space-x-4">
+                      <h1 className="font-semibold text-xl text-gray-800">
+                        Descarga el Archivo
+                      </h1>
+
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline truncate max-w-xs"
+                      >
+                        <span className="font-medium">
+                          {fileUrl.split("/").pop()}
+                        </span>
+                      </a>
+                    </div>
+
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center p-2 text-white rounded-lg hover:bg-red-100 transition-colors duration-300"
+                    >
+                      <img src="/images/file/PDF.png" alt="" className="w-10" />
+                    </a>
+                  </div>
+                );
+              } else if (extension === "ppt") {
+                return (
+                  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md mb-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center space-x-4">
+                      <h1 className="font-semibold text-xl text-gray-800">
+                        Descarga el Archivo
+                      </h1>
+
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline truncate max-w-xs"
+                      >
+                        <span className="font-medium">
+                          {fileUrl.split("/").pop()}
+                        </span>
+                      </a>
+                    </div>
+
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center p-2 text-white rounded-lg hover:bg-red-100 transition-colors duration-300"
+                    >
+                      <img src="/images/file/PPT.png" alt="" className="w-10" />
+                    </a>
+                  </div>
+                );
+              } else if (extension === "pptx") {
+                return (
+                  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md mb-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center space-x-4">
+                      <h1 className="font-semibold text-xl text-gray-800">
+                        Descarga el Archivo
+                      </h1>
+
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline truncate max-w-xs"
+                      >
+                        <span className="font-medium">
+                          {fileUrl.split("/").pop()}
+                        </span>
+                      </a>
+                    </div>
+
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center p-2 text-white rounded-lg hover:bg-red-100 transition-colors duration-300"
+                    >
+                      <img
+                        src="/images/file/PPTX.png"
+                        alt=""
+                        className="w-10"
+                      />
+                    </a>
+                  </div>
+                );
+              } else if (["mp3", "wav"].includes(extension)) {
+                return (
+                  <div className="flex ">
+                    <Waveform url={fileUrl} className="cursor-pointer" />
+                  </div>
+                );
+              } else if (["mp4", "mpeg", "webm", "ogg"].includes(extension)) {
+                return (
+                  <div className="flex">
+                    <video
+                      src={fileUrl}
+                      controls
+                      className="cursor-pointer bg-amber-400"
+                    />
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md mb-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center space-x-4">
+                      <h1 className="font-semibold text-xl text-gray-800">
+                        Descarga el Archivo
+                      </h1>
+
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline truncate max-w-xs"
+                      >
+                        <span className="font-medium">
+                          {fileUrl.split("/").pop()}
+                        </span>
+                      </a>
+                    </div>
+
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                    >
+                      <Download size={32} />
+                    </a>
+                  </div>
+                );
+              }
+            })()}
+          </div>
         )}
 
         <div className="flex justify-between text-info">

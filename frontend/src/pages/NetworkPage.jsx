@@ -4,8 +4,11 @@ import FriendRequest from "../components/FriendRequest";
 import { UserPlus } from "lucide-react";
 import UserCard from "../components/UserCard";
 import { useConnectionRequest } from "../../hooks/useConnectionRequest";
+import useRedirectLoggedOutUser from "../../hooks/useRedirectLoggedOutUser";
 
 const NetworkPage = () => {
+  useRedirectLoggedOutUser("/login");
+
   const { user } = useSelector((state) => state.auth);
 
   const { connectionRequest, connections } = useConnectionRequest();

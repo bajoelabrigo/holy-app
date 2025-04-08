@@ -6,6 +6,7 @@ import {
   selectUser,
 } from "../../redux/fectures/auth/authSlice";
 import { toast } from "react-toastify";
+import useRedirectLoggedOutUser from "../../../hooks/useRedirectLoggedOutUser";
 
 const cloud_name = `${import.meta.env.VITE_CLOUD_NAME};`;
 const upload_preset = `${import.meta.env.VITE_UPLOAD_PRESET}`;
@@ -19,6 +20,8 @@ export const shortenText = (text, n) => {
 };
 
 const Profile = () => {
+  useRedirectLoggedOutUser("/login");
+
   const dispatch = useDispatch();
   const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector(
     (state) => state.auth
@@ -111,10 +114,12 @@ const Profile = () => {
     <>
       <div className="">
         <div className="card card-side bg-base-100  p-8 shadow-xl">
-          <div className="space-y-1">
+          <div className="space-y-6 flex flex-col items-center justify-center">
             <figure className="">
               <img
-                src={imagePreview === null ? user?.profilePicture : imagePreview}
+                src={
+                  imagePreview === null ? user?.profilePicture : imagePreview
+                }
                 alt="Profileimg"
                 className="overflow-hidden object-cover rounded-xl size-40
                 "
@@ -130,53 +135,68 @@ const Profile = () => {
           </div>
           <div className="card-body">
             <div className="">
-              <h3 className="font-bold text-lg my-3"> Update Profile</h3>
+              <h3 className="font-bold text-2xl my-3"> Update Profile</h3>
               <h3 className="font-bold text-lg my-3">Role: {profile?.role}</h3>
               <form className="flex flex-col gap-4" onSubmit={saveProfile}>
                 <div className="flex flex-wrap gap-2">
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                    value={profile?.name}
-                    onChange={handleInputChange}
-                  />
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="Name"
-                    className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                    value={profile?.username}
-                    onChange={handleInputChange}
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                    value={profile?.email}
-                    onChange={handleInputChange}
-                  />
+                  <div className="flex flex-col">
+                    <span>Name</span>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Name"
+                      className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                      value={profile?.name}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span>Username</span>
+                    <input
+                      type="text"
+                      name="username"
+                      placeholder="Name"
+                      className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                      value={profile?.username}
+                      onChange={handleInputChange}
+                    />{" "}
+                  </div>
+                  <div className="flex flex-col">
+                    <span>Email</span>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                      value={profile?.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>{" "}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <input
-                    type="text"
-                    value={profile?.phone}
-                    placeholder="Phone"
-                    className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                    name="phone"
-                    onChange={handleInputChange}
-                  />
-                  <textarea
-                    name="bio"
-                    value={profile?.bio}
-                    placeholder="Bio"
-                    className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                    onChange={handleInputChange}
-                    cols={30}
-                    rows={10}
-                  />
+                  <div className="flex flex-col">
+                    <span>Phone</span>
+                    <input
+                      type="text"
+                      value={profile?.phone}
+                      placeholder="Phone"
+                      className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                      name="phone"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <div>Biography</div>
+                    <textarea
+                      name="bio"
+                      value={profile?.bio}
+                      placeholder="Bio"
+                      className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                      onChange={handleInputChange}
+                      cols={30}
+                      rows={10}
+                    />
+                  </div>
                 </div>
 
                 <button className="btn-primary rounded-full btn text-white">

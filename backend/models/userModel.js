@@ -54,7 +54,7 @@ const userSchema = mongoose.Schema(
     },
     headline: {
       type: String,
-      default: "Linkedin User",
+      default: "Holy User",
     },
     location: {
       type: String,
@@ -109,7 +109,7 @@ const userSchema = mongoose.Schema(
     },
   },
   {
-    collection:"users",
+    collection: "users",
     timestamps: true,
     minimize: false,
   }

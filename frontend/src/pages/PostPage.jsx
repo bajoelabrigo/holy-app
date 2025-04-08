@@ -4,8 +4,11 @@ import { axiosInstance } from "../lib/axios";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Posts";
 import { useSelector } from "react-redux";
+import useRedirectLoggedOutUser from "../../hooks/useRedirectLoggedOutUser";
 
 const PostPage = () => {
+  useRedirectLoggedOutUser("/login");
+
   const { postId } = useParams();
   const { user: authUser } = useSelector((state) => state.auth);
 

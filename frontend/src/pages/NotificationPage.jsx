@@ -14,8 +14,11 @@ import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { formatDistanceToNow } from "date-fns";
 import { useSelector } from "react-redux";
+import useRedirectLoggedOutUser from "../../hooks/useRedirectLoggedOutUser";
 
 const NotificationsPage = () => {
+  useRedirectLoggedOutUser("/login");
+
   const { user: authUser } = useSelector((state) => state.auth);
 
   const queryClient = useQueryClient();
@@ -61,7 +64,7 @@ const NotificationsPage = () => {
       case "like":
         return (
           <span>
-            <strong>{notification.relatedUser.name}{" "}</strong>liked your post
+            <strong>{notification.relatedUser.name} </strong>liked your post
           </span>
         );
       case "comment":
@@ -96,7 +99,7 @@ const NotificationsPage = () => {
   const renderRelatedPost = (relatedPost) => {
     if (!relatedPost) return null;
 
-    console.log(relatedPost)
+    console.log(relatedPost);
     return (
       <Link
         to={`/post/${relatedPost._id}`}
@@ -110,14 +113,11 @@ const NotificationsPage = () => {
           />
         )}
         <div className="flex-1 overflow-hidden">
-          <p className="text-sm text-info truncate">
-            {relatedPost.content}
-          </p>
+          <p className="text-sm text-info truncate">{relatedPost.content}</p>
         </div>
         <ExternalLink size={14} className="text-base-content" />
       </Link>
     );
-
   };
 
   return (

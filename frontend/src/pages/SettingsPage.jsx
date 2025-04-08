@@ -1,9 +1,12 @@
+import useRedirectLoggedOutUser from "../../hooks/useRedirectLoggedOutUser";
 import { THEMES } from "../constants";
 import { useThemeStore } from "../store/useThemeStore";
 
 import React from "react";
 
 const SettingsPage = () => {
+  useRedirectLoggedOutUser("/login");
+
   const { theme, setTheme } = useThemeStore();
 
   return (

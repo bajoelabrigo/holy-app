@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
 import authService from "./authService";
 
-
 const initialState = {
   isLoggedIn: false,
   user: null,
@@ -307,7 +306,7 @@ export const loginWithGoogle = createAsyncThunk(
           error.response.data.message) ||
         error.message ||
         error.toString();
-      return thunkAPI.rejectWithValue(message);
+      return thunkAPI.rejectWithValue(response);
     }
   }
 );
@@ -324,32 +323,14 @@ const authSlice = createSlice({
       state.message = "";
     },
     CALC_VERIFIED_USER(state, action) {
-      const array = [];
-      state.users.map((user) => {
-        const { isVerified } = user;
-        return array.push(isVerified);
-      });
-      let count = 0;
-      array.forEach((item) => {
-        if (item === true) {
-          count += 1;
-        }
-      });
-      state.verifiedUsers = count;
+      state.verifiedUsers = state.users.filter(
+        (user) => user.isVerified
+      ).length;
     },
     CALC_SUSPENDED_USER(state, action) {
-      const array = [];
-      state.users.map((user) => {
-        const { role } = user;
-        return array.push(role);
-      });
-      let count = 0;
-      array.forEach((item) => {
-        if (item === "suspended") {
-          count += 1;
-        }
-      });
-      state.suspendedUsers = count;
+      state.suspendedUsers = state.users.filter(
+        (user) => user.role === "suspended"
+      ).length;
     },
   },
   extraReducers: (builder) => {
@@ -382,6 +363,8 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.isLoggedIn = true;
         state.user = action.payload;
+        state.isError = false;
+        state.message = "";
         toast.success("Loggin Successful");
         console.log(action.payload);
       })
@@ -390,7 +373,7 @@ const authSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
         state.user = null;
-        toast.error(action.payload);
+        toast.error("Problemas al logguearse", action.payload);
         if (action.payload.includes("New browser")) {
           state.twoFactor = true;
         }
@@ -484,6 +467,7 @@ const authSlice = createSlice({
       .addCase(verifyUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.user = action.payload;
         state.message = action.payload;
         toast.success(action.payload);
       })
@@ -554,7 +538,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        toast.success(action.payload);
+        toast.error(action.payload);
       })
       //!Delete User
       .addCase(deleteUser.pending, (state, action) => {
@@ -649,5 +633,6 @@ export const { RESET, CALC_VERIFIED_USER, CALC_SUSPENDED_USER } =
 
 export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
 export const selectUser = (state) => state.auth.user;
+export const selectIsLoading = (state) => state.auth.isLoading;
 
 export default authSlice.reducer;
