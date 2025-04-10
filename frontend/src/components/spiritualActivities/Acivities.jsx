@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
+import { Church } from "@phosphor-icons/react";
 
 function Activities() {
   const { user } = useSelector((state) => state.auth);
@@ -30,7 +31,9 @@ function Activities() {
       alert("Te has inscrito con éxito!");
     } catch (error) {
       console.error("Error joining activity:", error);
-      toast.error(error.response && error.response.data && error.response.data.message);
+      toast.error(
+        error.response && error.response.data && error.response.data.message
+      );
     }
   };
 
@@ -38,10 +41,19 @@ function Activities() {
     navigate(`/activity/${activityId}`); // Redirige a la página de detalles con el ID
   };
 
-  
+  const handleDeleteActivity = async (activityId) => {
+  try {
+    await axiosInstance.delete(`/activities/${activityId}`);
+    toast.success("Actividad eliminada con éxito!");
+    navigate("/activities");
+  } catch (error) {
+    console.error("Error deleting activity:", error);
+    alert("Hubo un error al eliminar la actividad.");
+  }
+};
 
   return (
-    <div >
+    <div>
       <h1 className="text-3xl font-bold text-center mb-8">
         Actividades Espirituales
       </h1>
@@ -53,16 +65,23 @@ function Activities() {
           {activities.map((activity) => (
             <div
               key={activity._id}
-              className="bg-white shadow-lg rounded-lg p-4"
+              className="bg-base-100 shadow-lg rounded-lg p-4 space-y-1 "
             >
-              <h2 className="text-2xl font-semibold">{activity.title}</h2>
-              <p className="text-gray-600">{activity.description}</p>
-              <p className="text-sm text-gray-500">
-                Desde: {new Date(activity.startDate).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                Hasta: {new Date(activity.endDate).toLocaleDateString()}
-              </p>
+              <h2 className="text-2xl font-semibold ">{activity.title}</h2>
+              <div className="flex items-center">
+                <div className="px-2">
+                  <Church size={100} className="" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="text">{activity.description}</p>
+                  <p className="text-info">
+                    Desde: {new Date(activity.startDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-success">
+                    Hasta: {new Date(activity.endDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
               <div className="flex flex-wrap items-center  gap-2">
                 <button
                   className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"

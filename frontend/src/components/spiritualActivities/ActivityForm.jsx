@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
+import toast from "react-hot-toast";
 
 function ActivityForm() {
   const { id } = useParams();
@@ -17,9 +18,7 @@ function ActivityForm() {
       const fetchActivityDetails = async () => {
         try {
           setLoading(true);
-          const response = await axiosInstance.get(
-            `/activities/${id}`
-          );
+          const response = await axiosInstance.get(`/activities/${id}`);
           const activity = response.data;
           setTitle(activity.title);
           setDescription(activity.description);
@@ -51,25 +50,21 @@ function ActivityForm() {
       setLoading(true);
 
       if (id) {
-        await axiosInstance.put(
-          `/activities/${id}`,
-          activityData,
-          {
-            withCredentials: true,
-          }
-        );
-        alert("Actividad actualizada con éxito!");
+        await axiosInstance.put(`/activities/${id}`, activityData, {
+          withCredentials: true,
+        });
+        toast.success("Actividad actualizada con éxito!");
       } else {
         await axiosInstance.post("/activities", activityData, {
           withCredentials: true,
         });
-        alert("Actividad creada con éxito!");
+        toast.success("Actividad creada con éxito!");
       }
 
       navigate("/activities"); // Redirigir a la lista de actividades
     } catch (error) {
       console.error("Error submitting activity:", error);
-      alert("Hubo un error al crear o actualizar la actividad.");
+      toast.error("Hubo un error al crear o actualizar la actividad.");
     } finally {
       setLoading(false);
     }

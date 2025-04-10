@@ -34,7 +34,8 @@ const activitySchema = new mongoose.Schema(
           ref: "User",
         },
         petition: {
-          type: String, // o reflexión, según el tipo
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Petition",
         },
       },
     ],

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
@@ -21,7 +21,8 @@ import { useSelector } from "react-redux";
 import Waveform from "./voice/WaveForm";
 import extractLinks from "../utils/extraLinks";
 import { confirmAlert } from "react-confirm-alert";
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import ShareButton from "./ShareButtons";
 
 const Post = ({ post }) => {
   const { postId } = useParams();
@@ -330,7 +331,7 @@ const Post = ({ post }) => {
           </div>
         )}
 
-        <div className="flex justify-between text-info">
+        <div className="flex justify-between text-info space-y-4">
           <PostAction
             icon={
               <ThumbsUp
@@ -347,8 +348,8 @@ const Post = ({ post }) => {
             text={`Comment (${comments.length})`}
             onClick={() => setShowComments(!showComments)}
           />
-          <PostAction icon={<Share2 size={18} />} text="Share" />
         </div>
+         <ShareButton/>
       </div>
 
       {showComments && (

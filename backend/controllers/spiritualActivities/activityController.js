@@ -39,7 +39,8 @@ export const getActivityById = async (req, res) => {
   try {
     const activity = await Activity.findById(req.params.id)
       .populate("createdBy", "name ")
-      .populate("participants.user", "name profilePicture role");
+      .populate("participants.user", "-password")
+      .populate("participants.petition", "petitionText");
 
     if (!activity) {
       return res.status(404).json({ message: "Actividad no encontrada" });
@@ -244,6 +245,60 @@ export const getPetitions = async (req, res) => {
     res.status(200).json(petitions);
   } catch (error) {
     console.error("Error al obtener peticiones:", error.message);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// PATCH /activities/:activityId/petitions/:petitionId
+export const updatePetition = async (req, res) => {
+  try {
+    const { petitionId } = req.params;
+    const { petitionText } = req.body;
+    const userId = req.user._id;
+
+    const petition = await Petition.findById(petitionId).populate("userId");
+
+    if (!petition)
+      return res.status(404).json({ message: "Petición no encontrada" });
+
+    if (
+      petition.userId._id.toString() !== userId.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    petition.petitionText = petitionText;
+    await petition.save();
+
+    res.json({ message: "Petición actualizada con éxito", petition });
+  } catch (error) {
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// DELETE /activities/:activityId/petitions/:petitionId
+export const deletePetition = async (req, res) => {
+  try {
+    const { petitionId } = req.params;
+    const userId = req.user._id;
+
+    const petition = await Petition.findById(petitionId);
+
+    if (!petition)
+      return res.status(404).json({ message: "Petición no encontrada" });
+
+    if (
+      petition.userId.toString() !== userId.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    await petition.deleteOne();
+
+    res.json({ message: "Petición eliminada con éxito" });
+  } catch (error) {
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };

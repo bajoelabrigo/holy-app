@@ -9,6 +9,8 @@ import RecommendedUser from "../../components/RecommendedUser";
 import Post from "../../components/Posts";
 import { Link } from "react-router-dom";
 import EmailVerificationCard from "../../components/EmailVerificationCard";
+import { confirmAlert } from "react-confirm-alert";
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const Home = () => {
   useRedirectLoggedOutUser("/login");

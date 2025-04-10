@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
+import toast from "react-hot-toast";
 
 function EditActivityPage() {
   const { id } = useParams(); // ID de la actividad desde la URL
@@ -44,11 +45,11 @@ function EditActivityPage() {
     e.preventDefault();
     try {
       await axiosInstance.put(`/activities/${id}`, form);
-      alert("Actividad actualizada");
+      toast.success("Actividad actualizada");
       navigate("/activities");
     } catch (err) {
       console.error("Error al actualizar actividad:", err);
-      alert("No se pudo actualizar la actividad.");
+      toast.error("No se pudo actualizar la actividad.");
     }
   };
 

@@ -11,6 +11,8 @@ import {
   getParticipantsOfActivity,
   createPetition,
   getPetitions,
+  deletePetition,
+  updatePetition,
 } from "../../controllers/spiritualActivities/activityController.js";
 import { adminOnly, protect } from "../../middlewares/authMiddleware.js";
 
@@ -40,9 +42,13 @@ router.post("/:activityId/join", protect, enrollUserInActivity);
 // Ruta para obtener los participantes de una actividad
 router.get("/:activityId/participants", protect, getParticipantsOfActivity);
 
-// Ruta para crear peticiones de oración
+// Ruta crud peticiones de oración
 router.post("/:activityId/petitions", protect, createPetition);
 
 router.get("/:activityId/petitions", protect, getPetitions);
+
+router.patch("/:activityId/petitions/:petitionId", protect, updatePetition);
+
+router.delete("/:activityId/petitions/:petitionId", protect, deletePetition);
 
 export default router;

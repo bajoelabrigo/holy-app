@@ -7,7 +7,7 @@ import {
   Settings2,
   UsersRound,
 } from "lucide-react";
-import { HandsPraying } from "@phosphor-icons/react";
+import { Church, HandsPraying } from "@phosphor-icons/react";
 
 export default function Sidebar({ user }) {
   const imgUrl = user?.profilePicture?.toString();
@@ -55,6 +55,18 @@ export default function Sidebar({ user }) {
                 <HandsPraying className="mr-2" size={20} /> Spiritual Activities
               </Link>
             </li>
+            {
+              user?.role ==="admin" ? (
+                <li>
+              <Link
+                to="/activity-form"
+                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
+                <Church className="mr-2" size={20} /> Add Spiritual Activities
+              </Link>
+            </li>
+              ):null
+            }
             <li>
               <Link
                 to="/network"

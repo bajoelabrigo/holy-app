@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { axiosInstance } from "../../lib/axios";
+import toast from "react-hot-toast";
 
 function EnrollActivityForm({ activityId }) {
   const [petitionText, setPetitionText] = useState("");
@@ -10,6 +11,7 @@ function EnrollActivityForm({ activityId }) {
 
     if (!petitionText.trim()) {
       setError("La petición no puede estar vacía.");
+      toast.error("La petición no puede estar vacía.", error);
       return;
     }
 
@@ -17,19 +19,20 @@ function EnrollActivityForm({ activityId }) {
       await axiosInstance.post(`/activities/${activityId}/petitions`, {
         petitionText,
       });
-      alert("Petición de oración enviada con éxito!");
+      toast.success("Petición de oración enviada con éxito!");
       setPetitionText(""); // Limpiar el campo de texto
     } catch (error) {
       console.error("Error al enviar la petición:", error);
       setError(
         error.response?.data?.message || "Hubo un error al enviar la petición."
       );
+      toast.error("Hubo un error al enviar la petición.", error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mt-4">
-      <h3 className="text-xl font-semibold">Pedir Oración</h3>
+      <h3 className="text-xl font-semibold">Pedido de Oración</h3>
       <textarea
         value={petitionText}
         onChange={(e) => setPetitionText(e.target.value)}
