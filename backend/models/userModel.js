@@ -95,6 +95,7 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       required: true,
+      enum: ["admin", "subscriber", "author"],
       default: "subscriber",
       // subscriber, author, and admin (suspended)
     },

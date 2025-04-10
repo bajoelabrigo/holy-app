@@ -56,6 +56,9 @@ const Home = () => {
                 <RecommendedUser key={user._id} user={user} />
               ))}
             </div>
+            <Link to="/activities" className="">
+              <img src="/actividades.png" alt="" className="mt-6"/>
+            </Link>
           </div>
         )}
       </div>

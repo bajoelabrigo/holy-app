@@ -30,6 +30,10 @@ import ChatPage from "./pages/ChatPage";
 import NotificationsPage from "./pages/NotificationPage";
 import { ErrorPage } from "./ErrorPage";
 import LayoutChat from "./components/layout/LayoutChat";
+import ActivitiesPage from "./pages/ActivitiesPage";
+import ActivityDetails from "./pages/ActivityDetails";
+import ActivityForm from "./components/spiritualActivities/ActivityForm";
+import EditActivityPage from "./components/spiritualActivities/EditActivityPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -54,20 +58,24 @@ const App = () => {
           <Route path="forgot" element={<Forgot />} />
           <Route path="resetPassword/:resetToken" element={<Reset />} />
           <Route path="loginWithCode/:email" element={<LoginWithCode />} />
-
           <Route path="verify/:verificationToken" element={<Verify />} />
           <Route path="profile" element={<Profile />} />
           <Route path="changePassword" element={<ChangePassword />} />
           <Route path="users" element={<UserList />} />
-
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="network" element={<NetworkPage />} />
           <Route path="post/:postId" element={<PostPage />} />
           <Route path="profile/:username" element={<ProfilePage />} />
-
           <Route path="not_found" element={<ErrorPage />} />
           <Route path="*" element={<Navigate to="/not_found" />} />
+          {/*Activities */}
+          <Route path="/activities" element={<ActivitiesPage />} />
+          <Route path="/activity/:activityId" element={<ActivityDetails />} />
+          <Route path="/activity-form/:id" element={<ActivityForm />} />{" "}
+          <Route path="/activity-form" element={<ActivityForm />} />{" "}
+          <Route path="/activities/edit/:id" element={<EditActivityPage />} />
         </Route>
+        {/*Chat */}
         <Route path="/chat" element={<LayoutChat />}>
           <Route index element={<ChatPage />}></Route>
         </Route>

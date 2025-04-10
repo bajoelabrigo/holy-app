@@ -19,7 +19,7 @@ const Verify = () => {
     if (res.meta.requestStatus === "fulfilled") {
       await dispatch(getLoginStatus()); // o getUser()
       await dispatch(getUser()); // o getUser()
-      
+      navigate("/")
     }
   };
 

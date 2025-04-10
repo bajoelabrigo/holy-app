@@ -363,9 +363,7 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.isLoggedIn = true;
         state.user = action.payload;
-        state.isError = false;
-        state.message = "";
-        toast.success("Loggin Successful");
+        toast.success("Login Successful");
         console.log(action.payload);
       })
       .addCase(login.rejected, (state, action) => {
@@ -373,7 +371,7 @@ const authSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
         state.user = null;
-        toast.error("Problemas al logguearse", action.payload);
+        toast.error(action.payload);
         if (action.payload.includes("New browser")) {
           state.twoFactor = true;
         }

@@ -17,7 +17,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //! Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, username, email, password } = req.body;
+  const { name, username, email, password, adminInviteToken } = req.body;
 
   // Validation
   if (!name || !username || !email || !password) {
@@ -43,6 +43,12 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Email already in use");
   }
 
+  // Determine user role: Admin if correct token is provided, otherwise Member
+  let role = "subscriber";
+  if (adminInviteToken && adminInviteToken == process.env.ADMIN_INVITE_TOKEN) {
+    role = "admin";
+  }
+
   // Get Browser Agent
   const ua = UAParser(req.headers["user-agent"]);
   const userAgent = [ua.ua];
@@ -54,6 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     userAgent,
+    role,
   });
 
   // Generate token

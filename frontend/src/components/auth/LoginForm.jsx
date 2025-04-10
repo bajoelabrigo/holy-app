@@ -45,6 +45,8 @@ const SignUpForm = () => {
       dispatch(sendLoginCode(email));
       navigate(`/loginWithCode/${email}`);
     }
+
+    dispatch(RESET());
   }, [isLoggedIn, isSuccess, dispatch, navigate, isError, twoFactor, email]);
 
   const googleLogin = async (credentialResponse) => {

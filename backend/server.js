@@ -19,6 +19,8 @@ import postRoutes from "./routes/media/postRoutes.js";
 import notificationRoutes from "./routes/media/notifications.js";
 import connectionRoutes from "./routes/media/connection.js";
 import messageRoutes from "./routes/chat/messajesRoutes.js";
+import activityRoutes from "./routes/spiritualActivities/espiritualActivitiesRoutes.js";
+
 import { app, server } from "./lib/socket.js";
 
 //dotenv config
@@ -81,6 +83,9 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/connections", connectionRoutes);
 //Chat
 app.use("/api/messages", messageRoutes);
+
+//Spiritual Activities
+app.use("/api/activities", activityRoutes);
 
 //Error Handler
 app.use(errorHandler);

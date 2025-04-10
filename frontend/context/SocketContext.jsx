@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import {useSelector} from "react-redux"
+import { useSelector } from "react-redux";
 
 import io from "socket.io-client";
 
@@ -13,6 +13,12 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const { user: authUser } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   useEffect(() => {
     if (authUser) {
@@ -37,6 +43,26 @@ export const SocketContextProvider = ({ children }) => {
       }
     }
   }, [authUser]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("newMessage", (data) => {
+      console.log("Nuevo mensaje recibido via socket:", data); // <- ¿Esto aparece?
+
+      // Mostrar notificación del navegador
+      if (Notification.permission === "granted") {
+        new Notification("Nuevo mensaje", {
+          body: `${data.senderId.name}: ${data.message}`,
+          icon: "/chat-icon.png", // opcional
+        });
+      }
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>

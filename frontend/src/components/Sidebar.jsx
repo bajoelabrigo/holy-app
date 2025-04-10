@@ -7,6 +7,7 @@ import {
   Settings2,
   UsersRound,
 } from "lucide-react";
+import { HandsPraying } from "@phosphor-icons/react";
 
 export default function Sidebar({ user }) {
   const imgUrl = user?.profilePicture?.toString();
@@ -30,7 +31,7 @@ export default function Sidebar({ user }) {
             {user?.role}
           </button>
         </Link>
-        <p className="text-info">{user?.headline}</p>
+        <p className="text-info mt-2">{user?.headline}</p>
         <p className="text-secondary text-xs">
           {user?.connections?.length} connections
         </p>
@@ -44,6 +45,14 @@ export default function Sidebar({ user }) {
                 className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
               >
                 <Home className="mr-2" size={20} /> Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/activities"
+                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
+                <HandsPraying className="mr-2" size={20} /> Spiritual Activities
               </Link>
             </li>
             <li>
