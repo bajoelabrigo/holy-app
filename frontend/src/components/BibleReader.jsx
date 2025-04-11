@@ -82,7 +82,9 @@ export default function BibleReader() {
       <div className="flex space-x-4 mb-4">
         <button
           className={`px-4 py-2 rounded ${
-            tab === "explorer" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"
+            tab === "explorer"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-600"
           }`}
           onClick={() => setTab("explorer")}
         >
@@ -90,7 +92,9 @@ export default function BibleReader() {
         </button>
         <button
           className={`px-4 py-2 rounded ${
-            tab === "search" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"
+            tab === "search"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-600"
           }`}
           onClick={() => setTab("search")}
         >
@@ -98,7 +102,9 @@ export default function BibleReader() {
         </button>
         <button
           className={`px-4 py-2 rounded ${
-            tab === "favorites" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"
+            tab === "favorites"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-600"
           }`}
           onClick={() => setTab("favorites")}
         >
@@ -118,7 +124,9 @@ export default function BibleReader() {
                 setSelectedChapter("");
               }}
             >
-              <option value="">Seleccione un libro</option>
+              <option value="" className="text-gray-600">
+                Seleccione un libro
+              </option>
               {books?.map((book) => (
                 <option key={book} value={book} className="text-gray-600">
                   {book}
@@ -132,7 +140,9 @@ export default function BibleReader() {
               onChange={(e) => setSelectedChapter(e.target.value)}
               disabled={!selectedBook}
             >
-              <option value="">Capítulo</option>
+              <option value="" className="text-gray-600">
+                Capítulo
+              </option>
               {chapters?.map((ch) => (
                 <option key={ch} value={ch} className="text-gray-600">
                   {ch}
@@ -140,16 +150,68 @@ export default function BibleReader() {
               ))}
             </select>
 
-            <button
-              className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
-              disabled={!selectedBook || !selectedChapter || loadingVerses}
-            >
-              {loadingVerses ? "Cargando..." : "Leer capítulo completo"}
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="bg-gray-300 hover:bg-gray-600 hover:text-white text-gray-600 px-3 py-2 rounded disabled:opacity-50"
+                disabled={!selectedBook || !selectedChapter}
+                onClick={() => {
+                  const currentIndex = books?.indexOf(selectedBook);
+                  const currentChapter = Number(selectedChapter);
+
+                  if (currentChapter > 1) {
+                    setSelectedChapter((prev) => `${currentChapter - 1}`);
+                  } else if (currentIndex > 0) {
+                    const previousBook = books[currentIndex - 1];
+                    getChapters(previousBook).then((prevChapters) => {
+                      setSelectedBook(previousBook);
+                      setSelectedChapter(
+                        `${Math.max(...prevChapters.map(Number))}`
+                      );
+                    });
+                  }
+                }}
+              >
+                ⬅ Anterior
+              </button>
+              <button className="bg-green-600 hover:bg-green-700  text-white px-4 py-2 rounded disabled:opacity-50">
+                {selectedBook} {selectedChapter}
+              </button>
+              <button
+                className="bg-gray-300 text-gray-600 hover:bg-gray-600 hover:text-white px-3 py-2 rounded disabled:opacity-50"
+                disabled={!selectedBook || !selectedChapter}
+                onClick={() => {
+                  const currentIndex = books?.indexOf(selectedBook);
+                  const currentChapter = Number(selectedChapter);
+                  const lastChapter = Math.max(...(chapters || []).map(Number));
+
+                  if (currentChapter < lastChapter) {
+                    setSelectedChapter((prev) => `${currentChapter + 1}`);
+                  } else if (currentIndex < books.length - 1) {
+                    const nextBook = books[currentIndex + 1];
+                    getChapters(nextBook).then((nextChapters) => {
+                      setSelectedBook(nextBook);
+                      setSelectedChapter("1");
+                    });
+                  }
+                }}
+              >
+                Siguiente ➡
+              </button>
+            </div>
           </div>
 
-          {loadingBooks || loadingChapters || loadingVerses ? (
-            <p className="text-center text-sm text-gray-600">Cargando...</p>
+          {loadingBooks ? (
+            <p className="text-center text-lg text-gray-700 font-semibold">
+              Cargando Libros...
+            </p>
+          ) : loadingChapters ? (
+            <p className="text-center text-lg text-gray-700 font-semibold">
+              Cargando Capitulos...
+            </p>
+          ) : loadingVerses ? (
+            <p className="text-center text-lg text-gray-700 font-semibold">
+              Cargando Versiculos...
+            </p>
           ) : (
             <div className="space-y-2">
               {verses &&
@@ -161,7 +223,7 @@ export default function BibleReader() {
                       handleVerseClick(selectedBook, selectedChapter, num)
                     }
                   >
-                    <p>
+                    <p className="ml-4">
                       <strong>{num}</strong>. {text}
                     </p>
                     <div className="flex gap-2">
@@ -188,7 +250,7 @@ export default function BibleReader() {
                           copiedVerse ===
                           `${selectedBook}-${selectedChapter}-${num}`
                             ? "bg-green-400 text-white"
-                            : "bg-gray-300 text-gray-400"
+                            : "bg-gray-300 text-gray-600"
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -272,7 +334,7 @@ export default function BibleReader() {
                       className={`px-2 py-1 rounded text-sm  ${
                         copiedVerse === `${book}-${chapter}-${verse}`
                           ? "bg-green-400 text-white"
-                          : "bg-gray-300 text-gray-500"
+                          : "bg-gray-300 text-gray-600"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -328,7 +390,7 @@ export default function BibleReader() {
                       className={`px-2 py-1 rounded text-sm ${
                         copiedVerse === `${book}-${chapter}-${verse}`
                           ? "bg-green-400 text-white"
-                          : "bg-gray-300"
+                          : "bg-gray-300 text-gray-600"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
