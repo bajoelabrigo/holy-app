@@ -76,13 +76,14 @@ const App = () => {
           <Route path="/activity-form/:id" element={<ActivityForm />} />
           <Route path="/activity-form" element={<ActivityForm />} />
           <Route path="/activities/edit/:id" element={<EditActivityPage />} />
-
-          {/*Bible */}
-          <Route path="/bible" element={<BibleReader />} />
         </Route>
         {/*Chat */}
         <Route path="/chat" element={<LayoutChat />}>
           <Route index element={<ChatPage />}></Route>
+        </Route>
+        <Route path="/bible" element={<LayoutChat />}>
+          <Route index element={<BibleReader />} />
+          {/*Bible */}
         </Route>
       </Routes>
       <ToastContainer />
