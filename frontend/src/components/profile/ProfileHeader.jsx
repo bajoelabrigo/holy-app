@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 
 const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [editedData, setEditedData] = useState({});
   const queryClient = useQueryClient();
 
@@ -181,9 +182,17 @@ const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
     }
   };
 
-  const handleSave = () => {
-    onSave(editedData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      await onSave(editedData); // debe ser una promesa
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error al guardar el perfil:", error);
+      toast.error("Hubo un error al guardar el perfil");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -283,10 +292,15 @@ const ProfileHeader = ({ userData, onSave, isOwnProfile }) => {
         {isOwnProfile ? (
           isEditing ? (
             <button
-              className="w-full bg-neutral text-white py-2 px-4 rounded-full hover:bg-neutral-700 transition duration-300"
+              className="w-full bg-neutral text-white py-2 px-4 rounded-full hover:bg-neutral-700 transition duration-300 flex justify-center items-center gap-2"
               onClick={handleSave}
+              disabled={isLoading}
             >
-              Save Profile
+              {isLoading ? (
+                <span className="loading loading-spinner loading-sm text-white" />
+              ) : (
+                "Save Profile"
+              )}
             </button>
           ) : (
             <button

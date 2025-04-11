@@ -30,20 +30,17 @@ import {
   VKShareCount,
   WhatsappIcon,
   WhatsappShareButton,
-  XIcon
+  XIcon,
 } from "react-share";
 
-import "../Demo.css";
-import exampleImage from '/avatar.png';
-
 export function ShareButton() {
-  const shareUrl = window.location.href
+  const shareUrl = window.location.href;
   const title = "HolyHolyHoly";
 
-  const exampleImage=<img src="/avatar.png"/>
+  const exampleImage = <img src="/avatar.png" />;
 
   return (
-    <div className="Demo__container mt-2">
+    <div className="Demo__container mt-2 flex space-x-1.5">
       <div className="Demo__some-network">
         <FacebookShareButton
           url={shareUrl}

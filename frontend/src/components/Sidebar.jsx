@@ -6,11 +6,13 @@ import {
   MessageSquare,
   Settings2,
   UsersRound,
+  Book,
 } from "lucide-react";
 import { Church, HandsPraying } from "@phosphor-icons/react";
 
 export default function Sidebar({ user }) {
   const imgUrl = user?.profilePicture?.toString();
+
   return (
     <div className="bg-base-100 text-base-content rounded-lg shadow">
       <div className="p-4 text-center">
@@ -55,18 +57,24 @@ export default function Sidebar({ user }) {
                 <HandsPraying className="mr-2" size={20} /> Spiritual Activities
               </Link>
             </li>
-            {
-              user?.role ==="admin" ? (
-                <li>
+            {user?.role === "admin" ? (
+              <li>
+                <Link
+                  to="/activity-form"
+                  className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+                >
+                  <Church className="mr-2" size={20} /> Add Spiritual Activities
+                </Link>
+              </li>
+            ) : null}
+            <li>
               <Link
-                to="/activity-form"
+                to="/bible"
                 className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
               >
-                <Church className="mr-2" size={20} /> Add Spiritual Activities
+                <Book className="mr-2" size={20} /> Read the Bible
               </Link>
             </li>
-              ):null
-            }
             <li>
               <Link
                 to="/network"
@@ -99,18 +107,16 @@ export default function Sidebar({ user }) {
                 <Settings2 className="mr-2" size={20} /> Settings
               </Link>
             </li>
-            {
-              user?.role ==="admin" ? (
-                <li>
-              <Link
-                to="/users"
-                className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
-              >
-                <UsersRound className="mr-2" size={20} /> List Users
-              </Link>
-            </li>
-              ):null
-            }
+            {user?.role === "admin" ? (
+              <li>
+                <Link
+                  to="/users"
+                  className="flex items-center py-2 px-4 rounded-md hover:bg-primary hover:text-white transition-colors"
+                >
+                  <UsersRound className="mr-2" size={20} /> List Users
+                </Link>
+              </li>
+            ) : null}
           </ul>
         </nav>
       </div>

@@ -20,6 +20,7 @@ import notificationRoutes from "./routes/media/notifications.js";
 import connectionRoutes from "./routes/media/connection.js";
 import messageRoutes from "./routes/chat/messajesRoutes.js";
 import activityRoutes from "./routes/spiritualActivities/espiritualActivitiesRoutes.js";
+import bibleRoutes from "./routes/bible/bibleRoutes.js"
 
 import { app, server } from "./lib/socket.js";
 
@@ -87,6 +88,9 @@ app.use("/api/messages", messageRoutes);
 //Spiritual Activities
 app.use("/api/activities", activityRoutes);
 
+//Bible
+app.use('/api/bible', bibleRoutes);
+
 //Error Handler
 app.use(errorHandler);
 
@@ -104,7 +108,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {})
   .then(() => {
     logger.info("DB is connected");
   })

@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import EmailVerificationCard from "../../components/EmailVerificationCard";
 import { confirmAlert } from "react-confirm-alert";
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import RandomVerse from "../../components/RandomVerse";
 
 const Home = () => {
   useRedirectLoggedOutUser("/login");
@@ -26,6 +27,7 @@ const Home = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="hidden lg:block lg:col-span-1">
           <Sidebar user={user} />
+          <RandomVerse/>
         </div>
         <div className="col-span-1 lg:col-span-2 order-first lg:order-none">
           {/*Create posts */}
@@ -59,7 +61,9 @@ const Home = () => {
               ))}
             </div>
             <Link to="/activities" className="">
-              <img src="/actividades.png" alt="" className="mt-6"/>
+              <img src="/actividades.png" alt="" className="mt-6 rounded-lg"/>
+            </Link> <Link to="/bible" className="">
+              <img src="/biblia.png" alt="" className="mt-6 rounded-lg"/>
             </Link>
           </div>
         )}

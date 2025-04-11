@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import { Church } from "@phosphor-icons/react";
+import ShareButton from "../ShareButtons";
 
 function Activities() {
   const { user } = useSelector((state) => state.auth);
@@ -42,15 +43,15 @@ function Activities() {
   };
 
   const handleDeleteActivity = async (activityId) => {
-  try {
-    await axiosInstance.delete(`/activities/${activityId}`);
-    toast.success("Actividad eliminada con éxito!");
-    navigate("/activities");
-  } catch (error) {
-    console.error("Error deleting activity:", error);
-    alert("Hubo un error al eliminar la actividad.");
-  }
-};
+    try {
+      await axiosInstance.delete(`/activities/${activityId}`);
+      toast.success("Actividad eliminada con éxito!");
+      navigate("/activities");
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      alert("Hubo un error al eliminar la actividad.");
+    }
+  };
 
   return (
     <div>
@@ -113,6 +114,9 @@ function Activities() {
                     </button>
                   </div>
                 )}
+              </div>
+              <div className="mt-4">
+                <ShareButton />
               </div>
             </div>
           ))}

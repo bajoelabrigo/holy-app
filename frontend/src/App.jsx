@@ -34,6 +34,8 @@ import ActivitiesPage from "./pages/ActivitiesPage";
 import ActivityDetails from "./pages/ActivityDetails";
 import ActivityForm from "./components/spiritualActivities/ActivityForm";
 import EditActivityPage from "./components/spiritualActivities/EditActivityPage";
+import BibleSearch from "./components/BibleReader";
+import BibleReader from "./components/BibleReader";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -71,9 +73,12 @@ const App = () => {
           {/*Activities */}
           <Route path="/activities" element={<ActivitiesPage />} />
           <Route path="/activity/:activityId" element={<ActivityDetails />} />
-          <Route path="/activity-form/:id" element={<ActivityForm />} />{" "}
-          <Route path="/activity-form" element={<ActivityForm />} />{" "}
+          <Route path="/activity-form/:id" element={<ActivityForm />} />
+          <Route path="/activity-form" element={<ActivityForm />} />
           <Route path="/activities/edit/:id" element={<EditActivityPage />} />
+
+          {/*Bible */}
+          <Route path="/bible" element={<BibleReader />} />
         </Route>
         {/*Chat */}
         <Route path="/chat" element={<LayoutChat />}>

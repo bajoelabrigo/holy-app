@@ -9,7 +9,6 @@ import {
   Loader,
   MessageCircle,
   Send,
-  Share2,
   ThumbsUp,
   Trash2,
 } from "lucide-react";
@@ -166,10 +165,12 @@ const Post = ({ post }) => {
           <Microlink style={{ width: "100%" }} url={links[0]} />
         )}
         {/*Message*/}
-        <p
-          dangerouslySetInnerHTML={{ __html: originalString }}
-          className=" ProseMirror"
-        ></p>
+        <div className="mb-4">
+          <p
+            dangerouslySetInnerHTML={{ __html: originalString }}
+            className=" ProseMirror"
+          ></p>
+        </div>
 
         {/* Vista previa del archivo adjunto */}
         {post?.image && (
@@ -349,7 +350,7 @@ const Post = ({ post }) => {
             onClick={() => setShowComments(!showComments)}
           />
         </div>
-         <ShareButton/>
+        <ShareButton />
       </div>
 
       {showComments && (
