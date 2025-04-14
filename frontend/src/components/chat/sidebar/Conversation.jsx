@@ -15,12 +15,35 @@ const Conversation = ({ conversation, lastIdx }) => {
         }`}
         onClick={() => setSelectedConversation(conversation)}
       >
-        <div
-          className={`rounded-full avatar ${isOnline ? "online" : "offline"}`}
-        >
-          <div className="w-12 h-12 rounded-full object-cover overflow-hidden">
-            <img src={conversation.profilePicture || "/avatar.png"} />
-          </div>
+        <div className={`rounded-full  ${isOnline ? "online" : "offline"}`}>
+          {conversation.isGroup ? (
+            <div className="relative w-12 h-12">
+              <img
+                src={
+                  conversation.participants?.[0]?.profilePicture ||
+                  "/avatar.png"
+                }
+                className="absolute w-8 h-8 rounded-full border-2 border-white z-10 top-0 left-0 object-cover"
+              />
+              <img
+                src={
+                  conversation.participants?.[1]?.profilePicture ||
+                  "/avatar.png"
+                }
+                className="absolute w-8 h-8 rounded-full border-2 border-white z-0 top-2 left-2 object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className={`rounded-full avatar ${
+                isOnline ? "online" : "offline"
+              }`}
+            >
+              <div className="w-12 h-12 rounded-full object-cover overflow-hidden">
+                <img src={conversation.profilePicture || "/avatar.png"} />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col flex-1">

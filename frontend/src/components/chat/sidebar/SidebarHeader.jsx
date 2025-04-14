@@ -57,9 +57,7 @@ const SidebarHeader = () => {
         </div>
       </div>
       {/*Create Group */}
-      {showCreateGroup && (
-        <CreateGroup setShowCreateGroup={setShowCreateGroup} />
-      )}
+      {showCreateGroup && <CreateGroup />}
     </>
   );
 };

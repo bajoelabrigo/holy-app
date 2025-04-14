@@ -85,6 +85,7 @@ app.use("/api/connections", connectionRoutes);
 //Chat
 app.use("/api/messages", messageRoutes);
 
+
 //Spiritual Activities
 app.use("/api/activities", activityRoutes);
 

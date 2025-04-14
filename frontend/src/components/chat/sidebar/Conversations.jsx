@@ -10,7 +10,7 @@ const Conversations = () => {
         <Conversation
           key={conversations._id}
           conversation={conversations}
-          lastIdx={idx === conversations.length - 1}
+          lastIdx={idx === conversations?.length - 1}
         />
       ))}
       {loading ? (
