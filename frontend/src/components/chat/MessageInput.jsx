@@ -4,12 +4,18 @@ import useSendMessage from "../../../hooks/useSendMessage";
 import EmojiPicker from "emoji-picker-react";
 import Attachments from "./attachments/Attachments";
 import VoiceRecorder from "../voice/VoiceRecorder";
+import useConversation from "../../../zustand/useConversation";
+import { useSocketContext } from "../../../context/SocketContext";
+import { useSelector } from "react-redux";
 
 const MessageInput = () => {
+  const { socket } = useSocketContext();
+  const { selectedConversation } = useConversation();
   const [message, setMessage] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
   const { sendMessage } = useSendMessage();
   const [showEmojiPicker, setShowEmojiPicker] = useState();
@@ -38,6 +44,15 @@ const MessageInput = () => {
     };
   }, []);
 
+  const handleTyping = () => {
+    if (selectedConversation?._id) {
+      socket.emit("typing", {
+        conversationId: selectedConversation._id,
+        senderName: user.name, // o como tengas tu usuario
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex  mx-4 relative">
       <button
@@ -65,7 +80,10 @@ const MessageInput = () => {
       <input
         type="text"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => {
+          setMessage(e.target.value);
+          handleTyping(); // ✅ emitir "typing"
+        }}
         className="flex-grow p-3 pl-30 rounded-l-3xl border-2 border-sky-500 
         focus:outline-none focus:ring-2 focus:ring-gray-300"
         placeholder="Type a message..."

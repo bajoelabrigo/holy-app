@@ -1,14 +1,20 @@
+// models/chat/groupModel.js
 import mongoose from "mongoose";
 
 const groupSchema = new mongoose.Schema(
   {
+    _id: {
+      type: mongoose.Schema.Types.ObjectId, // igual al ID de la conversación
+      ref: "Conversation",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
     },
     profilePicture: {
       type: String,
-      default: "", // o un link por defecto
+      default: "",
     },
     status: {
       type: String,
@@ -25,12 +31,6 @@ const groupSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    conversationId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Conversation",
-      required: true,
-      unique: true, // Para que cada grupo tenga una conversación única
-    },
   },
   { timestamps: true }
 );

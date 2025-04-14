@@ -41,3 +41,9 @@ export const sendMessageChat = async (messageData, selectedUser) => {
     handleError(error);
   }
 };
+
+export const createConversation = async (receiverId) => {
+  const res = await axiosInstance.post(`/messages/conversation/${receiverId}`);
+  console.log("crear conversation", res.data)
+  return res.data;
+};

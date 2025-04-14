@@ -3,6 +3,7 @@ import trimRequest from "trim-request";
 import { protect } from "../../middlewares/authMiddleware.js";
 import {
   createGroupChat,
+  createOneToOneConversation,
   deleteMessage,
   editMessage,
   getMessages,
@@ -30,5 +31,8 @@ router.put("/message/:messageId", trimRequest.all, protect, editMessage);
 
 // Eliminar mensaje enviado
 router.delete("/message/:messageId", trimRequest.all, protect, deleteMessage);
+
+// POST /messages/conversation/:receiverId
+router.post("/conversation/:receiverId", protect, createOneToOneConversation);
 
 export default router;

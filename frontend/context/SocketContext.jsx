@@ -45,6 +45,15 @@ export const SocketContextProvider = ({ children }) => {
   }, [authUser]);
 
   useEffect(() => {
+  if (socket) {
+    socket.onAny((event, ...args) => {
+      console.log("📡 Evento recibido:", event, args);
+    });
+  }
+}, [socket]);
+
+
+  useEffect(() => {
     if (!socket) return;
 
     socket.on("newMessage", (data) => {

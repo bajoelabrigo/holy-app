@@ -2,6 +2,7 @@ import React from "react";
 import useGetConversations from "../../../../hooks/useGetConversations";
 import useConversation from "../../../../zustand/useConversation";
 import { useSocketContext } from "../../../../context/SocketContext";
+import { createConversation } from "../../../../hooks/chatService";
 
 const Contact = ({ contact }) => {
   const { loading, conversations } = useGetConversations();
@@ -9,7 +10,9 @@ const Contact = ({ contact }) => {
   const { onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(contact?._id);
 
-  const isSelected = selectedConversation?._id === contact?._id;
+  const isSelected =
+    selectedConversation?._id === contact?._id ||
+    selectedConversation?.participants?.some((p) => p._id === contact?._id);
 
   return (
     <li
@@ -17,7 +20,23 @@ const Contact = ({ contact }) => {
         isSelected ? "bg-blue-900" : ""
       } cursor-pointer 
     px-[10px]`}
-      onClick={() => setSelectedConversation(contact)}
+      onClick={async () => {
+        try {
+          console.log("👆 Usuario seleccionado:", contact);
+
+          const newConv = await createConversation(contact._id);
+          console.log("✅ Conversación creada:", newConv);
+
+          if (newConv && newConv._id) {
+            setSelectedConversation(newConv);
+            console.log("📌 Conversación seteada:", newConv);
+          } else {
+            console.error("❌ No se creó la conversación");
+          }
+        } catch (err) {
+          console.error("🔥 Error al crear conversación:", err);
+        }
+      }}
     >
       {/*Container */}
       <div className="flex items-center gap-x-3 py-[10px]">

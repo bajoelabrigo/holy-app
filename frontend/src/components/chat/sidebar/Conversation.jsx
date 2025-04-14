@@ -1,5 +1,7 @@
 import useConversation from "../../../../zustand/useConversation";
 import { useSocketContext } from "../../../../context/SocketContext";
+import { useEffect } from "react";
+import { createConversation } from "../../../../hooks/chatService";
 
 const Conversation = ({ conversation, lastIdx }) => {
   const { selectedConversation, setSelectedConversation } = useConversation();
@@ -7,13 +9,39 @@ const Conversation = ({ conversation, lastIdx }) => {
   const { onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(conversation._id);
 
+  useEffect(() => {
+    if (conversation && conversation._id !== selectedConversation?._id) {
+      setSelectedConversation(conversation); // ✅ solo cambia si es diferente
+    }
+  }, [conversation?._id]);
+
   return (
     <>
       <div
         className={`flex gap-2 items-center rounded p-2 py-1 cursor-pointer ${
           isSelected ? "bg-blue-900 " : ""
         }`}
-        onClick={() => setSelectedConversation(conversation)}
+        onClick={async () => {
+          if (conversation._id) {
+            // conversación ya existe
+            setSelectedConversation(conversation);
+          } else if (conversation.userId) {
+            // no hay conversación aún, crearla
+            try {
+              const newConv = await createConversation(conversation.userId);
+              if (newConv?._id) {
+                setSelectedConversation(newConv);
+              } else {
+                toast.error("No se pudo crear la conversación.");
+              }
+            } catch (error) {
+              console.error("Error creando conversación:", error);
+              toast.error("Error creando conversación.");
+            }
+          } else {
+            toast.error("No se puede iniciar conversación con este usuario.");
+          }
+        }}
       >
         <div className={`rounded-full  ${isOnline ? "online" : "offline"}`}>
           {conversation.isGroup ? (

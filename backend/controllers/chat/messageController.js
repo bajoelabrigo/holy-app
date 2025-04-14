@@ -2,6 +2,7 @@ import { getReceiverSocketId, io } from "../../lib/socket.js";
 import Conversation from "../../models/chat/conversationModel.js";
 import Message from "../../models/chat/messageModel.js";
 import User from "../../models/userModel.js";
+import Group from "../../models/chat/groupModel.js";
 
 // GET - Usuarios para la barra lateral
 export const getUsersForSidebar = async (req, res) => {
@@ -20,41 +21,29 @@ export const getUsersForSidebar = async (req, res) => {
 // POST - Enviar mensaje (1 a 1 o grupo)
 export const sendMessage = async (req, res) => {
   try {
-    const { message, files, isGroup = false } = req.body;
-    const { id } = req.params; // puede ser userId o conversationId
+    const { message, files } = req.body;
+    const { id: conversationId } = req.params;
     const senderId = req.user._id;
 
     if (!message && (!files || files.length === 0)) {
       return res.status(400).json({ error: "El mensaje no puede estar vacío" });
     }
 
-    let conversation;
+    // ✅ buscar conversación por su _id directo
+    const conversation = await Conversation.findById(conversationId);
 
-    if (isGroup) {
-      conversation = await Conversation.findById(id);
-      if (!conversation || !conversation.isGroup) {
-        return res.status(404).json({ error: "Grupo no encontrado" });
-      }
-    } else {
-      // Mensaje 1 a 1, buscamos o creamos la conversacion
-      conversation = await Conversation.findOne({
-        participants: { $all: [senderId, id] },
-        isGroup: false,
-      });
-
-      if (!conversation) {
-        conversation = await Conversation.create({
-          participants: [senderId, id],
-          isGroup: false,
-          messages: [],
-        });
-      }
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversación no encontrada" });
     }
 
     const newMessage = new Message({
       senderId,
-      receiverId: isGroup ? null : id,
-      conversationId: conversation._id, // <--- esta línea es clave
+      receiverId: conversation.isGroup
+        ? null
+        : conversation.participants.find(
+            (p) => p.toString() !== senderId.toString()
+          ),
+      conversationId: conversation._id,
       message,
       files: files || [],
     });
@@ -66,22 +55,15 @@ export const sendMessage = async (req, res) => {
       .populate("senderId", "-password")
       .populate("receiverId", "-password");
 
-    // SOCKET
-    if (isGroup) {
-      conversation.participants.forEach((participantId) => {
-        if (participantId.toString() !== senderId.toString()) {
-          const socketId = getReceiverSocketId(participantId.toString());
-          if (socketId) {
-            io.to(socketId).emit("newMessage", populatedMessage);
-          }
+    // socket emit...
+    conversation.participants.forEach((participantId) => {
+      if (participantId.toString() !== senderId.toString()) {
+        const socketId = getReceiverSocketId(participantId.toString());
+        if (socketId) {
+          io.to(socketId).emit("newMessage", populatedMessage);
         }
-      });
-    } else {
-      const receiverSocketId = getReceiverSocketId(id);
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", populatedMessage);
       }
-    }
+    });
 
     res.status(201).json(populatedMessage);
   } catch (error) {
@@ -92,23 +74,18 @@ export const sendMessage = async (req, res) => {
 
 // GET - Obtener mensajes por conversación
 export const getMessages = async (req, res) => {
+  const { id: conversationId } = req.params;
+
   try {
-    const { id } = req.params; // id de conversacion
-    const conversation = await Conversation.findById(id).populate({
-      path: "messages",
-      populate: [
-        { path: "senderId", select: "-password" },
-        { path: "receiverId", select: "-password" },
-      ],
-    });
+    const messages = await Message.find({ conversationId })
+      .populate("senderId", "-password")
+      .populate("receiverId", "-password")
+      .sort({ createdAt: 1 });
 
-    if (!conversation)
-      return res.status(404).json({ error: "Conversacion no encontrada" });
-
-    res.status(200).json(conversation.messages);
+    res.status(200).json(messages);
   } catch (error) {
-    console.error("Error in getMessages:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error al obtener mensajes:", error);
+    res.status(500).json({ message: "Error al obtener los mensajes" });
   }
 };
 
@@ -124,6 +101,7 @@ export const createGroupChat = async (req, res) => {
         .json({ error: "Proporciona un nombre y al menos 2 participantes" });
     }
 
+    // 1. Crear conversación
     const groupConversation = await Conversation.create({
       name,
       participants: [...participants, adminId],
@@ -132,10 +110,21 @@ export const createGroupChat = async (req, res) => {
       messages: [],
     });
 
+    // 2. Crear grupo asociado
+    await Group.create({
+      _id: groupConversation._id,
+      name,
+      admin: adminId,
+      participants: [...participants, adminId],
+      status: "Grupo", // <--- asegúrate que esto esté
+      profilePicture: "", // o una por defecto
+    });
+
     const fullGroup = await groupConversation.populate(
       "participants",
       "-password"
     );
+
     res.status(201).json(fullGroup);
   } catch (error) {
     console.error("Error in createGroupChat:", error.message);
@@ -195,5 +184,48 @@ export const deleteMessage = async (req, res) => {
   } catch (error) {
     console.error("Error in deleteMessage:", error.message);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// POST /messages/conversation/:receiverId
+export const createOneToOneConversation = async (req, res) => {
+  try {
+    const senderId = req.user._id;
+    const receiverId = req.params.receiverId;
+
+    if (!receiverId) {
+      return res.status(400).json({ error: "Receptor no especificado" });
+    }
+
+    // Buscar si ya existe una conversación entre los dos
+    let conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiverId] },
+      isGroup: false,
+    });
+
+    if (!conversation) {
+      // Crear nueva conversación
+      conversation = await Conversation.create({
+        participants: [senderId, receiverId],
+        isGroup: false,
+        messages: [],
+      });
+    }
+
+    const fullConversation = await conversation.populate(
+      "participants",
+      "-password"
+    );
+    console.log(
+      "🧪 Creando conversación entre:",
+      req.user._id,
+      "y",
+      req.params.receiverId
+    );
+
+    res.status(201).json(fullConversation);
+  } catch (error) {
+    console.error("Error en crear conversacion 1 a 1:", error.message);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };

@@ -3,18 +3,25 @@ import Message from "./Message";
 import MessageSkeleton from "./MessageSkeleton";
 import { UserRoundPen } from "lucide-react";
 import useGetMessages from "../../../../hooks/useGetMessages";
-import useListenMessages from "../../../../hooks/useListenMessages";
+
 import FileMessage from "../files/FileMessage";
 import { useSelector } from "react-redux";
+import useListenMessages from "../../../../hooks/useListenMessages";
+import TypingIndicator from "./typing";
+import useJoinConversation from "../../../../hooks/useConversationJoinSocket";
+import useConversation from "../../../../zustand/useConversation";
+import useTypingListener from "../../../../hooks/useTypingListener";
+import useChatListeners from "../../../../hooks/useChatListeners";
 
 const Messages = () => {
   const { loading, messages } = useGetMessages();
   const { user } = useSelector((state) => state.auth);
+  const { selectedConversation, typingStatus } = useConversation();
+  const typingUser = typingStatus[selectedConversation?._id];
 
-  //SOCKET TO MESSAGE
-  useListenMessages();
+  useChatListeners();
 
-  //MOVE SCROLL AFTER EVERY MESSAGE
+  // Scroll automático al último mensaje
   const lastMessageRef = useRef();
   useEffect(() => {
     setTimeout(() => {
@@ -28,17 +35,19 @@ const Messages = () => {
         messages?.length > 0 &&
         messages?.map((message) => (
           <div key={message._id}>
-            {/*Message files */}
+            {/* Archivos del mensaje */}
             {message?.files?.length > 0
               ? message.files.map((file, i) => (
                   <FileMessage
-                    key={`${message._id}-${i}`} // clave única combinada
+                    key={`${message._id}-${i}`}
                     FileMessage={file}
                     message={message}
                     me={user?._id === message?.senderId}
                   />
                 ))
               : null}
+
+            {/* Texto del mensaje */}
             {message?.message?.length > 0 ? (
               <Message message={message} />
             ) : null}
@@ -48,6 +57,7 @@ const Messages = () => {
         ))}
 
       {loading && [...Array(4)].map((_, idx) => <MessageSkeleton key={idx} />)}
+
       {!loading && messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full">
           <UserRoundPen className="text-sky-500" size={60} />
@@ -56,6 +66,11 @@ const Messages = () => {
           </p>
         </div>
       )}
+
+      {/* 👇 Mensaje de typing */}
+      <div className="mb-2">
+        {typingUser && <TypingIndicator name={typingUser} />}
+      </div>
     </div>
   );
 };

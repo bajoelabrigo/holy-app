@@ -8,7 +8,7 @@ import useGetMessages from "../../../../hooks/useGetMessages";
 
 const Message = ({ message }) => {
   const { user: authUser } = useSelector((state) => state.auth);
-  const { selectedConversation } = useConversation();
+  const { selectedConversation, typingStatus } = useConversation();
   const { deleteMessage, editMessage } = useGetMessages();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -84,7 +84,7 @@ const Message = ({ message }) => {
         )}
       </div>
 
-      <div className="chat-footer opacity-70 text-xs flex justify-between items-center gap-4">
+      <div className="chat-footer text-xs flex justify-between items-center gap-4">
         <span>{formattedTime}</span>
 
         {fromMe && (

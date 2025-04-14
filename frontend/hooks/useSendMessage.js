@@ -6,13 +6,10 @@ import { useState } from "react";
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false);
-  const { messages, setMessages, selectedConversation } = useConversation();
-  const [files, setFiles] = useState([]); // Estado local para manejar archivos
+  const { selectedConversation, addMessageToConversation } = useConversation();
+  const [files, setFiles] = useState([]);
 
-  const clearFiles = () => {
-    setFiles(() => []);
-  };
-
+  const clearFiles = () => setFiles([]);
   const addFiles = (newFiles) => {
     if (!Array.isArray(newFiles)) {
       console.error("addFiles received a non-array value:", newFiles);
@@ -27,27 +24,26 @@ const useSendMessage = () => {
       return;
     }
 
+    const conversationId = selectedConversation._id;
+
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("message", message);
-      files.forEach((file) => formData.append("files", file));
+      console.log("🧠 Enviando mensaje a conversación:", conversationId);
 
       const res = await axiosInstance.post(
-        `/messages/send/${selectedConversation._id}`,
-        {
-          message,
-          files,
-        },
+        `/messages/send/${conversationId}`,
+        { message, files },
         { headers: { "Content-Type": "application/json" } }
       );
-      setMessages([...messages, res.data]);
+
+      addMessageToConversation(conversationId, res.data);
     } catch (error) {
       toast.error(handleError(error) || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
   return { sendMessage, loading, addFiles, files, setFiles, clearFiles };
 };
 

@@ -11,15 +11,36 @@ const useGetConversations = () => {
     const getConversations = async () => {
       setLoading(true);
       try {
-        const res = await axiosInstance.get("/messages/users");
-        setConversations(res.data);
+        const res = await axiosInstance.get("/messages/conversations");
+        console.log("👉 Conversaciones desde backend:", res.data); // <-- Agregado aquí
+
+        const updatedConversations = res.data.map((conv) => {
+          if (conv.isGroup) {
+            return {
+              ...conv,
+              name: conv.name || "Grupo sin nombre",
+              profilePicture: conv.profilePicture || "/group-default.png",
+              status: `${conv.participants?.length || 0} miembros`,
+            };
+          } else {
+            return {
+              ...conv,
+              name: conv.name || conv.username || "Usuario sin nombre",
+              profilePicture: conv.profilePicture || "/avatar.png",
+              status: "Conversación privada",
+            };
+          }
+        });
+
+        setConversations(updatedConversations);
       } catch (error) {
-        toast(handleError(error));
+        toast.error(handleError(error));
       } finally {
         setLoading(false);
       }
     };
-    getConversations()
+
+    getConversations();
   }, []);
 
   return { loading, conversations };

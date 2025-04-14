@@ -33,6 +33,16 @@ io.on("connection", (socket) => {
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
+
+  socket.on("joinConversation", (conversationId) => {
+    console.log(`📥 ${socket.id} joined conversation ${conversationId}`);
+    socket.join(conversationId);
+  });
+
+  socket.on("typing", ({ conversationId, senderName }) => {
+    console.log("✏️ typing recibido:", senderName, "en", conversationId);
+    socket.to(conversationId).emit("typing", { conversationId, senderName });
+  });
 });
 
 export { app, io, server };

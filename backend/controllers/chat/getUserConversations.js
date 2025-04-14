@@ -1,6 +1,5 @@
 import Conversation from "../../models/chat/conversationModel.js";
 import Group from "../../models/chat/groupModel.js";
-import User from "../../models/userModel.js";
 
 export const getUserConversations = async (req, res) => {
   try {
@@ -16,39 +15,41 @@ export const getUserConversations = async (req, res) => {
       })
       .populate({
         path: "messages",
-        options: { sort: { createdAt: -1 }, limit: 1 }, // obtener el ultimo mensaje si lo deseas
+        options: { sort: { createdAt: -1 }, limit: 1 },
       });
 
     const formattedConversations = [];
 
     for (const convo of conversations) {
-      const isGroup = convo.participants.length > 2;
+      console.log("🔍 Procesando conversación:", convo._id);
 
-      if (isGroup) {
-        // Intentamos buscar si hay un grupo creado con ese mismo conversationId
+      if (convo.isGroup) {
         const group = await Group.findOne({ _id: convo._id });
+        console.log("📛 Grupo encontrado:", group?.name);
 
         if (group) {
           formattedConversations.push({
             _id: convo._id,
-            name: group.name,
-            profilePicture: group.profilePicture,
+            name: group.name || "Grupo sin nombre",
+            profilePicture: group.profilePicture || "/group-default.png",
             status: group.status || "Grupo",
             isGroup: true,
+            participants: convo.participants,
           });
         }
       } else {
-        // Conversacion 1 a 1: encontrar el otro participante
         const otherUser = convo.participants.find(
           (p) => p._id.toString() !== userId.toString()
         );
 
+        console.log("👤 Otro usuario:", otherUser?.name);
+
         if (otherUser) {
           formattedConversations.push({
             _id: convo._id,
-            name: otherUser.name,
-            profilePicture: otherUser.profilePicture,
-            status: otherUser.status,
+            name: otherUser.name || "Usuario",
+            profilePicture: otherUser.profilePicture || "/avatar.png",
+            status: otherUser.status || "Conversación privada",
             isGroup: false,
           });
         }
