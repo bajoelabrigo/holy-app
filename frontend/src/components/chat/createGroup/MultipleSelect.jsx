@@ -21,7 +21,7 @@ const MultipleSelect = ({
               alt=""
               className="w-8 h-8 object-cover rounded-full"
             />
-            <span className="text-gray-600">{user.label}</span>
+            <span className="text-gray-700">{user.label}</span>
           </div>
         )}
         styles={{

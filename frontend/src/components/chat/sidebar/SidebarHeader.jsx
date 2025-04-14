@@ -9,7 +9,6 @@ const SidebarHeader = () => {
   const { user } = useSelector((state) => state.auth);
   const { showCreateGroup, setShowCreateGroup, showMenu, setShowMenu } =
     useContext(HelpersContext);
-
   return (
     <>
       {/*Sidebar header */}

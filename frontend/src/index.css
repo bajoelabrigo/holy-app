@@ -166,7 +166,7 @@
     transform: translateY(100%);
   }
 }
-/* React select */
+/* React select
 .css-obio5r-control:hover {
   border-color: transparent !important;
 }
@@ -179,7 +179,6 @@
 }
 .css-1p3m7a8-multiValue {
   background: transparent !important;
-  color: #fff !important;
   border: 1px solid #025144;
   border-radius: 5px !important;
 }
@@ -199,9 +198,7 @@
 .css-12a83d4-MultiValueRemove:hover svg {
   fill: #fff !important;
 }
-.css-qbdosj-Input input {
-  color: #fff !important;
-}
+
 .css-1nmdiq5-menu {
   background: transparent !important;
   color: #fff !important;
@@ -210,7 +207,7 @@
 }
 .css-1n6sfyn-MenuList {
   background: transparent !important;
-}
+} */
 
 /*--- MenuList Scroollbar
   /* width */

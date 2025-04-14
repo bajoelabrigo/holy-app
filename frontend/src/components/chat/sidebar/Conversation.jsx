@@ -58,7 +58,14 @@ const Conversation = ({ conversation, lastIdx }) => {
                   conversation.participants?.[1]?.profilePicture ||
                   "/avatar.png"
                 }
-                className="absolute w-8 h-8 rounded-full border-2 border-white z-0 top-2 left-2 object-cover"
+                className="absolute w-8 h-8 rounded-full border-2 border-white z-5 top-2 left-2 object-cover"
+              />
+              <img
+                src={
+                  conversation.participants?.[2]?.profilePicture ||
+                  "/avatar.png"
+                }
+                className="absolute w-8 h-8 rounded-full border-2 border-white z-0 top-4 left-4 object-cover"
               />
             </div>
           ) : (
