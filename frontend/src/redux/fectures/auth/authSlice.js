@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import authService from "./authService";
 
 const initialState = {
+  onlineUsers: [], // ✅ nuevo campo
   isLoggedIn: false,
   user: null,
   users: [],
@@ -315,6 +316,10 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // otros reducers...
+    SET_ONLINE_USERS: (state, action) => {
+      state.onlineUsers = action.payload;
+    },
     RESET(state) {
       state.twoFactor = false;
       state.isError = false;
@@ -626,11 +631,16 @@ const authSlice = createSlice({
   },
 });
 
-export const { RESET, CALC_VERIFIED_USER, CALC_SUSPENDED_USER } =
-  authSlice.actions;
+export const {
+  RESET,
+  CALC_VERIFIED_USER,
+  CALC_SUSPENDED_USER,
+  SET_ONLINE_USERS,
+} = authSlice.actions;
 
 export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
 export const selectUser = (state) => state.auth.user;
 export const selectIsLoading = (state) => state.auth.isLoading;
+export const selectOnlineUsers = (state) => state.auth.onlineUsers;
 
 export default authSlice.reducer;

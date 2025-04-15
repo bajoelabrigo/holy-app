@@ -1,7 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import io from "socket.io-client";
+import { SET_ONLINE_USERS } from "../src/redux/fectures/auth/authSlice";
 
 const SocketContext = createContext();
 
@@ -11,7 +12,7 @@ export const useSocketContext = () => {
 
 export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const dispatch = useDispatch();
   const { user: authUser } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export const SocketContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (authUser) {
+    if (authUser && authUser._id) {
       const socket = io("http://localhost:5000", {
         query: {
           userId: authUser._id,
@@ -30,28 +31,25 @@ export const SocketContextProvider = ({ children }) => {
 
       setSocket(socket);
 
-      // socket.on() is used to listen to the events. can be used both on client and server side
       socket.on("getOnlineUsers", (users) => {
-        setOnlineUsers(users);
+        console.log("📡 Usuarios online recibidos:", users);
+        dispatch(SET_ONLINE_USERS(users));
       });
 
-      return () => socket.close();
+      return () => socket.disconnect(); // ✅ Esto es clave
     } else {
       if (socket) {
-        socket.close();
+        socket.disconnect();
         setSocket(null);
       }
     }
   }, [authUser]);
 
   useEffect(() => {
-  if (socket) {
-    socket.onAny((event, ...args) => {
-      console.log("📡 Evento recibido:", event, args);
-    });
-  }
-}, [socket]);
-
+    if (socket) {
+      socket.onAny((event, ...args) => {});
+    }
+  }, [socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -74,7 +72,7 @@ export const SocketContextProvider = ({ children }) => {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, onlineUsers }}>
+    <SocketContext.Provider value={{ socket }}>
       {children}
     </SocketContext.Provider>
   );

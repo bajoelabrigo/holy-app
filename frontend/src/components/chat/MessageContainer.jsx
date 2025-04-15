@@ -24,40 +24,40 @@ const MessageContainer = () => {
               <span className="label-text">To: </span>
               <span className=" font-bold">{selectedConversation?.name}</span>
             </div>
-            {selectedConversation.isGroup ? (
+            {selectedConversation?.isGroup ? (
               <div className="relative w-12 h-12">
                 <img
                   src={
-                    selectedConversation.participants?.[0]?.profilePicture ||
-                    "/avatar.png"
+                    selectedConversation?.participants?.[0]?.profilePicture ||
+                    "/profile.png"
                   }
                   className="absolute w-8 h-8 rounded-full border-2 border-white z-10 top-2 -left-14 object-cover"
                 />
                 <img
                   src={
-                    selectedConversation.participants?.[1]?.profilePicture ||
-                    "/avatar.png"
+                    selectedConversation?.participants?.[1]?.profilePicture ||
+                    "/profile.png"
                   }
                   className="absolute w-8 h-8 rounded-full border-2 border-white z-5  top-2 -left-10 object-cover"
                 />
                 <img
                   src={
-                    selectedConversation.participants?.[2]?.profilePicture ||
-                    "/avatar.png"
+                    selectedConversation?.participants?.[2]?.profilePicture ||
+                    "/profile.png"
                   }
                   className="absolute w-8 h-8 rounded-full border-2 border-white z-3  top-2 -left-6 object-cover"
                 />
                 <img
                   src={
-                    selectedConversation.participants?.[3]?.profilePicture ||
-                    "/avatar.png"
+                    selectedConversation?.participants?.[3]?.profilePicture ||
+                    "/profile.png"
                   }
                   className="absolute w-8 h-8 rounded-full border-2 border-white z-2  top-2 -left-2 object-cover"
                 />
                 <img
                   src={
-                    selectedConversation.participants?.[4]?.profilePicture ||
-                    "/avatar.png"
+                    selectedConversation?.participants?.[4]?.profilePicture ||
+                    "/profile.png"
                   }
                   className="absolute w-8 h-8 rounded-full border-2 border-white z-0  top-2 left-2 object-cover"
                 />
@@ -65,7 +65,7 @@ const MessageContainer = () => {
             ) : (
               <img
                 src={
-                  selectedConversation?.participants.profilePicture ||
+                  selectedConversation?.participants?.profilePicture ||
                   "/avatar.png"
                 }
                 className="w-10 h-10 rounded-full object-cover"
