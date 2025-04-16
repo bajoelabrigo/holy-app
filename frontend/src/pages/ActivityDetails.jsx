@@ -1,75 +1,92 @@
-import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 import EnrollActivityForm from "../components/spiritualActivities/UserFormActivities";
 import { HandsPraying } from "@phosphor-icons/react";
 import { useSelector } from "react-redux";
+import ParticipantsList from "../components/spiritualActivities/Participants";
+import toast from "react-hot-toast";
 
 function ActivityDetails() {
-  const { activityId } = useParams(); // Obtén el ID de la URL
+  const { activityId } = useParams();
   const { user } = useSelector((state) => state.auth);
+  const queryClient = useQueryClient();
 
-  const [activity, setActivity] = useState(null);
-  const [petitions, setPetitions] = useState([]); // Guardar las peticiones de oración
+  const {
+    data: activity,
+    isLoading: activityLoading,
+  } = useQuery({
+    queryKey: ["activity", activityId],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get(`/activities/${activityId}`);
+      return data;
+    },
+    enabled: !!activityId,
+  });
 
-  useEffect(() => {
-    const fetchActivityDetails = async () => {
-      try {
-        const response = await axiosInstance.get(`/activities/${activityId}`);
-        setActivity(response.data);
-      } catch (error) {
-        console.error("Error fetching activity details:", error);
-      }
-    };
+  const {
+    data: petitions = [],
+    isLoading: petitionsLoading,
+  } = useQuery({
+    queryKey: ["petitions", activityId],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get(
+        `/activities/${activityId}/petitions`
+      );
+      return data;
+    },
+    enabled: !!activityId,
+  });
 
-    const fetchPetitions = async () => {
-      try {
-        const response = await axiosInstance.get(
-          `/activities/${activityId}/petitions`
-        );
-        setPetitions(response.data);
-      } catch (error) {
-        console.error("Error fetching petitions:", error);
-      }
-    };
-
-    fetchActivityDetails();
-    fetchPetitions();
-  }, [activityId]);
-
-  if (!activity) return <div>Cargando detalles...</div>;
-
-  const handleDeletePetition = async (petitionId) => {
-    if (!confirm("¿Estás seguro de eliminar esta petición?")) return;
-
-    try {
+  const deletePetition = useMutation({
+    mutationFn: async (petitionId) => {
       await axiosInstance.delete(
         `/activities/${activityId}/petitions/${petitionId}`
       );
-      setPetitions((prev) => prev.filter((p) => p._id !== petitionId));
-    } catch (error) {
-      console.error("Error al eliminar:", error);
+    },
+    onSuccess: (_, petitionId) => {
+      queryClient.setQueryData(["petitions", activityId], (old) =>
+        old.filter((p) => p._id !== petitionId)
+      );
+      toast.success("Peticion eliminada");
+    },
+    onError: () => toast.error("Error al eliminar peticion"),
+  });
+
+  const editPetition = useMutation({
+    mutationFn: async ({ petitionId, petitionText }) => {
+      await axiosInstance.patch(
+        `/activities/${activityId}/petitions/${petitionId}`,
+        { petitionText }
+      );
+    },
+    onSuccess: (_, { petitionId, petitionText }) => {
+      queryClient.setQueryData(["petitions", activityId], (old) =>
+        old.map((p) =>
+          p._id === petitionId ? { ...p, petitionText } : p
+        )
+      );
+      toast.success("Peticion actualizada");
+    },
+    onError: () => toast.error("Error al editar peticion"),
+  });
+
+  if (activityLoading || petitionsLoading)
+    return <div className="text-center">Cargando detalles...</div>;
+
+  const handleDeletePetition = (petitionId) => {
+    if (confirm("¿Estás seguro de eliminar esta petición?")) {
+      deletePetition.mutate(petitionId);
     }
   };
 
   const handleEditPetition = (petition) => {
     const nuevoTexto = prompt("Editar petición:", petition.petitionText);
     if (!nuevoTexto || nuevoTexto === petition.petitionText) return;
-
-    axiosInstance
-      .patch(`/activities/${activityId}/petitions/${petition._id}`, {
-        petitionText: nuevoTexto,
-      })
-      .then((res) => {
-        setPetitions((prev) =>
-          prev.map((p) =>
-            p._id === petition._id ? { ...p, petitionText: nuevoTexto } : p
-          )
-        );
-      })
-      .catch((err) => {
-        console.error("Error actualizando petición:", err);
-      });
+    editPetition.mutate({
+      petitionId: petition._id,
+      petitionText: nuevoTexto,
+    });
   };
 
   return (
@@ -95,11 +112,13 @@ function ActivityDetails() {
       </div>
 
       <EnrollActivityForm activityId={activityId} />
-      <h2 className="text-xl font-semibold mt-6">Participantes y peticiones</h2>
+      <ParticipantsList activityId={activityId} />
+
+      <h2 className="text-xl font-semibold mt-6">Peticiones</h2>
       <ul className="mt-4 space-y-3">
         {petitions.map((petition) => {
-          const isOwner = petition.userId._id === user._id;
-          const isAdmin = user.role === "admin";
+          const isOwner = petition.userId?._id === user?._id;
+          const isAdmin = user?.role === "admin";
 
           return (
             <li
@@ -107,20 +126,22 @@ function ActivityDetails() {
               className="flex items-center gap-4 bg-gray-100 p-4 rounded-lg shadow"
             >
               <img
-                src={petition.userId.profilePicture || "/default-avatar.png"}
-                alt={petition.userId.name}
+                src={
+                  petition.userId?.profilePicture || "/profile.png"
+                }
+                alt={petition.userId?.name}
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div className="lg:flex  space-x-4 flex-1 items-center">
                 <p className="font-semibold text-info italic">
-                  {petition.userId.name}
+                  {petition.userId?.name}
                 </p>
                 <p
                   className={`font-semibold ${
-                    petition.userId.role === "admin" ? "bg-primary" : ""
-                  } px-2 py-0.5 rounded-md italic text-white`}
+                    petition.userId?.role === "admin" ? "bg-blue-500 text-white" : ""
+                  } px-2 py-0.5 rounded-md italic`}
                 >
-                  {petition.userId.role}
+                  {petition.userId?.role}
                 </p>
                 <p className="text-gray-700 italic mt-1">
                   <span className="text-red-500">Petición: </span>

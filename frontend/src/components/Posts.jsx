@@ -24,6 +24,8 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import ShareButton from "./ShareButtons";
 
 const Post = ({ post }) => {
+  const [editing, setEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(post.content);
   const { postId } = useParams();
 
   const { user: authUser } = useSelector((state) => state.auth);
@@ -36,13 +38,47 @@ const Post = ({ post }) => {
 
   const queryClient = useQueryClient();
 
+  const { mutate: updatePost } = useMutation({
+    mutationFn: async () => {
+      await axiosInstance.put(`/posts/update/${post._id}`, {
+        content: editedContent,
+      });
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["posts"], (oldData) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) =>
+            page.map((p) =>
+              p._id === post._id ? { ...p, content: editedContent } : p
+            )
+          ),
+        };
+      });
+      toast.success("Post updated successfully");
+      setEditing(false);
+    },
+    onError: (err) => {
+      toast.error(err.response.data.message || "Failed to update post");
+    },
+  });
+
   const { mutate: deletePost, isPending: isDeletingPost } = useMutation({
     mutationFn: async () => {
       await axiosInstance.delete(`/posts/delete/${post._id}`);
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.setQueryData(["posts"], (oldData) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) =>
+            page.filter((p) => p._id !== post._id)
+          ),
+        };
+      });
       toast.success("Post deleted successfully");
     },
     onError: (error) => {
@@ -148,18 +184,45 @@ const Post = ({ post }) => {
               </p>
             </div>
           </div>
-          {isOwner && (
-            <button
-              onClick={() => confirmDelete()}
-              className="text-red-500 hover:text-red-700"
-            >
-              {isDeletingPost ? (
-                <Loader size={18} className="animate-spin" />
-              ) : (
-                <Trash2 size={18} />
-              )}
-            </button>
+
+          {(isOwner || authUser?.role === "admin") && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setEditing(true)}
+                className="text-info hover:underline"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => confirmDelete()}
+                className="text-red-500 hover:underline"
+              >
+                Eliminar
+              </button>
+            </div>
           )}
+
+          {editing ? (
+            <div className="mt-4">
+              <textarea
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+                className="w-full h-24 p-2 border rounded bg-base-100 text-base-content"
+              />
+              <button
+                onClick={() => updatePost()}
+                className="mt-2 btn btn-primary"
+              >
+                Guardar cambios
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="ml-2 btn btn-secondary"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : null}
         </div>
         {links.length > 0 && (
           <Microlink style={{ width: "100%" }} url={links[0]} />

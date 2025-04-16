@@ -1,37 +1,67 @@
 import cloudinary from "../../lib/cloudinary.js";
 import Post from "../../models/media/postModel.js";
 import Notification from "../../models/media/notificationModel.js";
+import User from "../../models/userModel.js";
+import { io } from "../../lib/socket.js";
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find({
-      author: { $in: [...req.user.connections, req.user._id] },
-    })
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    let query;
+
+    if (req.user.role === "admin") {
+      query = {};
+    } else {
+      const adminIds = await getAdminUserIds();
+      query = {
+        author: {
+          $in: [...req.user.connections, req.user._id, ...adminIds],
+        },
+      };
+    }
+
+    const posts = await Post.find(query)
       .populate("author", "name username profilePicture headline")
       .populate("comments.user", "name profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json(posts);
+    res.status(200).json(posts); // 👈 debe ser un array plano
   } catch (error) {
-    console.error("Error in getFeedPosts controller:", error);
+    console.error("Error in getFeedPosts:", error);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+// Utilidad para encontrar IDs de usuarios admin
+const getAdminUserIds = async () => {
+  const admins = await User.find({ role: "admin" }).select("_id");
+  return admins.map((admin) => admin._id);
 };
 
 export const createPost = async (req, res) => {
   try {
     const { content, image } = req.body;
 
-    // Validación para asegurarnos que si no hay contenido ni imagen, se devuelve un error
-
-    // Creando el nuevo post
     const newPost = new Post({
       author: req.user._id,
       content,
-      image, // Image será la URL subida desde Cloudinary
+      image,
     });
 
     await newPost.save();
+
+    const populatedPost = await newPost.populate(
+      "author",
+      "name username profilePicture headline"
+    );
+
+    // 🔴 Emitir evento con socket.io
+    io.emit("newPost", populatedPost); // <--- todos los usuarios recibirán esto
 
     res.status(201).json(newPost);
   } catch (error) {
@@ -51,14 +81,16 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // check if the current user is the author of the post
-    if (post.author.toString() !== userId.toString()) {
+    if (
+      post.author.toString() !== userId.toString() &&
+      req.user.role !== "admin" &&
+      req.user.role !== "moderator"
+    ) {
       return res
         .status(403)
         .json({ message: "You are not authorized to delete this post" });
     }
 
-    // delete the image from cloudinary as well!
     if (post.image) {
       await cloudinary.uploader.destroy(
         post.image.split("/").pop().split(".")[0]
@@ -105,7 +137,6 @@ export const createComment = async (req, res) => {
       { new: true }
     ).populate("author", "name email username headline profilePicture");
 
-    // create a notification if the comment owner is not the post owner
     if (post.author._id.toString() !== req.user._id.toString()) {
       const newNotification = new Notification({
         recipient: post.author,
@@ -131,14 +162,11 @@ export const likePost = async (req, res) => {
     const userId = req.user._id;
 
     if (post.likes.includes(userId)) {
-      // unlike the post
       post.likes = post.likes.filter(
         (id) => id.toString() !== userId.toString()
       );
     } else {
-      // like the post
       post.likes.push(userId);
-      // create a notification if the post owner is not the user who liked
       if (post.author.toString() !== userId.toString()) {
         const newNotification = new Notification({
           recipient: post.author,
@@ -156,6 +184,38 @@ export const likePost = async (req, res) => {
     res.status(200).json(post);
   } catch (error) {
     console.error("Error in likePost controller:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updatePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const { content } = req.body;
+    const userId = req.user._id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Permitir si es autor o admin
+    if (
+      post.author.toString() !== userId.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to update this post",
+      });
+    }
+
+    post.content = content;
+    await post.save();
+
+    res.status(200).json(post);
+  } catch (error) {
+    console.error("Error in updatePost controller:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

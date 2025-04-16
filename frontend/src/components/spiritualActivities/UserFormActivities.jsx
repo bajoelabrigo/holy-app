@@ -1,33 +1,47 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 
 function EnrollActivityForm({ activityId }) {
   const [petitionText, setPetitionText] = useState("");
   const [error, setError] = useState("");
+  const queryClient = useQueryClient();
 
-  const handleSubmit = async (e) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      return await axiosInstance.post(`/activities/${activityId}/petitions`, {
+        petitionText,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Petición de oración enviada con éxito!");
+      setPetitionText(""); // Limpiar campo
+      setError("");
+
+      // ✅ Refrescar lista de peticiones y participantes si se están usando useQuery
+      queryClient.invalidateQueries({ queryKey: ["petitions", activityId] });
+      queryClient.invalidateQueries({ queryKey: ["participants", activityId] });
+    },
+    onError: (err) => {
+      const msg =
+        err.response?.data?.message || "Hubo un error al enviar la petición.";
+      toast.error(msg);
+      setError(msg);
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!petitionText.trim()) {
-      setError("La petición no puede estar vacía.");
-      toast.error("La petición no puede estar vacía.", error);
+      const msg = "La petición no puede estar vacía.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
-    try {
-      await axiosInstance.post(`/activities/${activityId}/petitions`, {
-        petitionText,
-      });
-      toast.success("Petición de oración enviada con éxito!");
-      setPetitionText(""); // Limpiar el campo de texto
-    } catch (error) {
-      console.error("Error al enviar la petición:", error);
-      setError(
-        error.response?.data?.message || "Hubo un error al enviar la petición."
-      );
-      toast.error("Hubo un error al enviar la petición.", error);
-    }
+    mutate();
   };
 
   return (
@@ -43,9 +57,10 @@ function EnrollActivityForm({ activityId }) {
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       <button
         type="submit"
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full font-semibold"
+        disabled={isPending}
+        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full font-semibold disabled:opacity-50"
       >
-        Enviar Petición
+        {isPending ? "Enviando..." : "Enviar Petición"}
       </button>
     </form>
   );

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
+import { useQueryClient } from "@tanstack/react-query";
 import io from "socket.io-client";
 import { SET_ONLINE_USERS } from "../src/redux/fectures/auth/authSlice";
 
@@ -14,6 +14,7 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
   const { user: authUser } = useSelector((state) => state.auth);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
@@ -30,6 +31,19 @@ export const SocketContextProvider = ({ children }) => {
       });
 
       setSocket(socket);
+
+      socket.on("newPost", (post) => {
+        console.log("📡 Nuevo post recibido vía socket:", post);
+
+        // 🔄 Agregar al inicio de la primera página de posts
+        queryClient.setQueryData(["posts"], (oldData) => {
+          if (!oldData) return;
+          return {
+            ...oldData,
+            pages: [[post, ...oldData.pages[0]], ...oldData.pages.slice(1)],
+          };
+        });
+      });
 
       socket.on("getOnlineUsers", (users) => {
         console.log("📡 Usuarios online recibidos:", users);

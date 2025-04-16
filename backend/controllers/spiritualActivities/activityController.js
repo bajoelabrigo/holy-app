@@ -4,8 +4,13 @@ import Petition from "../../models/spiritualActivities/petitionModel.js";
 // Crear nueva actividad
 export const createActivity = async (req, res) => {
   try {
-    const { title, description, type, startDate, endDate } = req.body;
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Solo el admin puede crear actividades" });
+    }
 
+    const { title, description, type, startDate, endDate } = req.body;
     const newActivity = new Activity({
       title,
       description,
@@ -56,23 +61,21 @@ export const getActivityById = async (req, res) => {
 // Editar una actividad
 export const updateActivity = async (req, res) => {
   try {
-    const { title, description, type, startDate, endDate } = req.body;
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Solo el admin puede editar actividades" });
+    }
 
+    const { title, description, type, startDate, endDate } = req.body;
     const updated = await Activity.findByIdAndUpdate(
       req.params.id,
-      {
-        title,
-        description,
-        type,
-        startDate,
-        endDate,
-      },
+      { title, description, type, startDate, endDate },
       { new: true }
     );
 
-    if (!updated) {
+    if (!updated)
       return res.status(404).json({ message: "Actividad no encontrada" });
-    }
 
     res.status(200).json(updated);
   } catch (error) {
@@ -84,11 +87,15 @@ export const updateActivity = async (req, res) => {
 // Eliminar una actividad
 export const deleteActivity = async (req, res) => {
   try {
-    const deleted = await Activity.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Actividad no encontrada" });
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Solo el admin puede eliminar actividades" });
     }
+
+    const deleted = await Activity.findByIdAndDelete(req.params.id);
+    if (!deleted)
+      return res.status(404).json({ message: "Actividad no encontrada" });
 
     res.status(200).json({ message: "Actividad eliminada" });
   } catch (error) {
@@ -102,14 +109,13 @@ export const joinActivity = async (req, res) => {
   try {
     const { petition } = req.body;
     const userId = req.user._id;
+
     const activity = await Activity.findById(req.params.id);
-
-    if (!activity) {
+    if (!activity)
       return res.status(404).json({ message: "Actividad no encontrada" });
-    }
 
-    const alreadyJoined = activity.participants.find((p) =>
-      p.user.equals(userId)
+    const alreadyJoined = activity.participants.some(
+      (p) => p.user.toString() === userId.toString()
     );
 
     if (alreadyJoined) {
@@ -121,7 +127,7 @@ export const joinActivity = async (req, res) => {
     activity.participants.push({ user: userId, petition });
     await activity.save();
 
-    res.status(200).json({ message: "Inscripción exitosa" });
+    return res.status(200).json({ message: "Inscripción exitosa" });
   } catch (error) {
     console.error("Error al unirse a la actividad:", error.message);
     res.status(500).json({ message: "Error del servidor" });

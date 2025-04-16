@@ -1,73 +1,61 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 
 function ActivityForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("oracion");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      const fetchActivityDetails = async () => {
-        try {
-          setLoading(true);
-          const response = await axiosInstance.get(`/activities/${id}`);
-          const activity = response.data;
-          setTitle(activity.title);
-          setDescription(activity.description);
-          setType(activity.type);
-          setStartDate(activity.startDate.split("T")[0]);
-          setEndDate(activity.endDate.split("T")[0]);
-        } catch (error) {
-          console.error("Error fetching activity details:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchActivityDetails();
-    }
-  }, [id]);
+  // ✅ useQuery para cargar datos si es edición
+  const { data: activityData, isLoading } = useQuery({
+    queryKey: ["activity", id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/activities/${id}`);
+      return res.data;
+    },
+    enabled: !!id, // Solo se ejecuta si hay un ID (modo edición)
+    onSuccess: (activity) => {
+      setTitle(activity.title);
+      setDescription(activity.description);
+      setType(activity.type);
+      setStartDate(activity.startDate.split("T")[0]);
+      setEndDate(activity.endDate.split("T")[0]);
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const activityData = {
-      title,
-      description,
-      type,
-      startDate,
-      endDate,
-    };
-
-    try {
-      setLoading(true);
-
+  // ✅ Mutación para crear o actualizar
+  const { mutate: saveActivity, isPending } = useMutation({
+    mutationFn: async (activityData) => {
       if (id) {
-        await axiosInstance.put(`/activities/${id}`, activityData, {
-          withCredentials: true,
-        });
-        toast.success("Actividad actualizada con éxito!");
+        return await axiosInstance.put(`/activities/${id}`, activityData);
       } else {
-        await axiosInstance.post("/activities", activityData, {
-          withCredentials: true,
-        });
-        toast.success("Actividad creada con éxito!");
+        return await axiosInstance.post("/activities", activityData);
       }
-
-      navigate("/activities"); // Redirigir a la lista de actividades
-    } catch (error) {
-      console.error("Error submitting activity:", error);
+    },
+    onSuccess: () => {
+      toast.success(
+        id ? "Actividad actualizada con éxito!" : "Actividad creada con éxito!"
+      );
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+      navigate("/activities");
+    },
+    onError: () => {
       toast.error("Hubo un error al crear o actualizar la actividad.");
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    saveActivity({ title, description, type, startDate, endDate });
   };
 
   return (
@@ -75,6 +63,7 @@ function ActivityForm() {
       <h1 className="text-3xl font-bold text-center mb-8">
         {id ? "Actualizar Actividad" : "Crear Nueva Actividad"}
       </h1>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-lg font-medium">
@@ -85,7 +74,7 @@ function ActivityForm() {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg text-xl"
             required
           />
         </div>
@@ -98,7 +87,7 @@ function ActivityForm() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg text-xl"
           />
         </div>
 
@@ -110,7 +99,7 @@ function ActivityForm() {
             id="type"
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg text-xl"
             required
           >
             <option value="oracion">Mes de Oración</option>
@@ -128,7 +117,7 @@ function ActivityForm() {
             id="startDate"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg text-xl"
             required
           />
         </div>
@@ -142,16 +131,16 @@ function ActivityForm() {
             id="endDate"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg text-xl"
             required
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 text-xl"
         >
-          {loading
+          {isPending
             ? "Guardando..."
             : id
             ? "Actualizar Actividad"

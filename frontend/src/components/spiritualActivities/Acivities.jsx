@@ -1,57 +1,50 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import { Church } from "@phosphor-icons/react";
 import ShareButton from "../ShareButtons";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Activities() {
   const { user } = useSelector((state) => state.auth);
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Inicializamos el hook para navegar
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const response = await axiosInstance.get("/activities");
-        setActivities(response.data);
-      } catch (error) {
-        console.error("Error fetching activities:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchActivities();
-  }, []);
+  // ✅ Obtener actividades con useQuery
+  const { data: activities = [], isLoading } = useQuery({
+    queryKey: ["activities"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/activities");
+      return res.data;
+    },
+  });
 
-  const handleJoinActivity = async (activityId) => {
-    try {
-      await axiosInstance.post(`/activities/${activityId}/join`);
-      alert("Te has inscrito con éxito!");
-    } catch (error) {
-      console.error("Error joining activity:", error);
+  // ✅ Unirse a una actividad (con toast)
+  const joinActivity = useMutation({
+    mutationFn: (activityId) =>
+      axiosInstance.post(`/activities/${activityId}/join`),
+    onSuccess: () => {
+      toast.success("Te has inscrito con éxito!");
+    },
+    onError: (error) => {
       toast.error(
-        error.response && error.response.data && error.response.data.message
+        error.response?.data?.message || "Error al unirse a la actividad"
       );
-    }
-  };
+    },
+  });
 
-  const handleViewActivityDetails = (activityId) => {
-    navigate(`/activity/${activityId}`); // Redirige a la página de detalles con el ID
-  };
-
-  const handleDeleteActivity = async (activityId) => {
-    try {
-      await axiosInstance.delete(`/activities/${activityId}`);
+  const deleteActivity = useMutation({
+    mutationFn: (activityId) =>
+      axiosInstance.delete(`/activities/${activityId}`),
+    onSuccess: () => {
       toast.success("Actividad eliminada con éxito!");
-      navigate("/activities");
-    } catch (error) {
-      console.error("Error deleting activity:", error);
-      alert("Hubo un error al eliminar la actividad.");
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["activities"] }); // Refrescar lista
+    },
+    onError: () => {
+      toast.error("Hubo un error al eliminar la actividad.");
+    },
+  });
 
   return (
     <div>
@@ -59,22 +52,22 @@ function Activities() {
         Actividades Espirituales
       </h1>
 
-      {loading ? (
+      {isLoading ? (
         <div className="text-center">Cargando actividades...</div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {activities.map((activity) => (
             <div
               key={activity._id}
-              className="bg-base-100 shadow-lg rounded-lg p-4 space-y-1 "
+              className="bg-base-100 shadow-lg rounded-lg p-4 space-y-1"
             >
-              <h2 className="text-2xl font-semibold ">{activity.title}</h2>
+              <h2 className="text-2xl font-semibold">{activity.title}</h2>
               <div className="flex items-center">
                 <div className="px-2">
-                  <Church size={100} className="" />
+                  <Church size={100} />
                 </div>
                 <div className="flex flex-col">
-                  <p className="text">{activity.description}</p>
+                  <p>{activity.description}</p>
                   <p className="text-info">
                     Desde: {new Date(activity.startDate).toLocaleDateString()}
                   </p>
@@ -83,16 +76,16 @@ function Activities() {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center  gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                  onClick={() => handleJoinActivity(activity._id)}
+                  onClick={() => joinActivity.mutate(activity._id)}
                 >
                   Unirme
                 </button>
                 <button
                   className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-                  onClick={() => handleViewActivityDetails(activity._id)} // Aquí se llama al método para ver detalles
+                  onClick={() => navigate(`/activity/${activity._id}`)}
                 >
                   Detalles
                 </button>
@@ -107,7 +100,7 @@ function Activities() {
                       Editar
                     </button>
                     <button
-                      onClick={() => handleDeleteActivity(activity._id)}
+                      onClick={() => deleteActivity.mutate(activity._id)}
                       className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                     >
                       Eliminar

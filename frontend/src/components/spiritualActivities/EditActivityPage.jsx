@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 
 function EditActivityPage() {
-  const { id } = useParams(); // ID de la actividad desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [form, setForm] = useState({
     title: "",
@@ -15,45 +17,49 @@ function EditActivityPage() {
     endDate: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  // 🔍 Cargar datos de la actividad
+  const { isLoading } = useQuery({
+    queryKey: ["activity", id],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get(`/activities/${id}`);
+      return data;
+    },
+    onSuccess: (data) => {
+      setForm({
+        title: data.title,
+        description: data.description,
+        type: data.type,
+        startDate: data.startDate.slice(0, 10),
+        endDate: data.endDate.slice(0, 10),
+      });
+    },
+  });
 
-  // Traer los datos actuales de la actividad
-  useEffect(() => {
-    const fetchActivity = async () => {
-      try {
-        const { data } = await axiosInstance.get(`/activities/${id}`);
-        setForm({
-          title: data.title,
-          description: data.description,
-          type: data.type,
-          startDate: data.startDate.slice(0, 10),
-          endDate: data.endDate.slice(0, 10),
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error("Error al cargar actividad:", error);
-      }
-    };
-    fetchActivity();
-  }, [id]);
+  // ✏️ Mutación para actualizar
+  const { mutate: updateActivity, isPending } = useMutation({
+    mutationFn: async () => {
+      return await axiosInstance.put(`/activities/${id}`, form);
+    },
+    onSuccess: () => {
+      toast.success("Actividad actualizada");
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+      navigate("/activities");
+    },
+    onError: () => {
+      toast.error("No se pudo actualizar la actividad.");
+    },
+  });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axiosInstance.put(`/activities/${id}`, form);
-      toast.success("Actividad actualizada");
-      navigate("/activities");
-    } catch (err) {
-      console.error("Error al actualizar actividad:", err);
-      toast.error("No se pudo actualizar la actividad.");
-    }
+    updateActivity();
   };
 
-  if (loading) return <div className="text-center">Cargando...</div>;
+  if (isLoading) return <div className="text-center">Cargando...</div>;
 
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white shadow-lg p-6 rounded-xl">
@@ -102,9 +108,10 @@ function EditActivityPage() {
         />
         <button
           type="submit"
+          disabled={isPending}
           className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
         >
-          Guardar cambios
+          {isPending ? "Guardando..." : "Guardar cambios"}
         </button>
       </form>
     </div>
