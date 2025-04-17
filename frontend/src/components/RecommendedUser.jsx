@@ -34,6 +34,12 @@ const RecommendedUser = ({ user }) => {
       queryClient.invalidateQueries({
         queryKey: ["connectionStatus", user._id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["connections"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["connectionRequests", user._id],
+      });
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || "An error occurred");
@@ -47,6 +53,12 @@ const RecommendedUser = ({ user }) => {
       toast.success("Connection request rejected");
       queryClient.invalidateQueries({
         queryKey: ["connectionStatus", user._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["connectionRequests", user._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["connections"],
       });
     },
     onError: (error) => {

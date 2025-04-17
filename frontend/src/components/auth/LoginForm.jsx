@@ -21,8 +21,9 @@ const SignUpForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isLoading, isLoggedIn, isSuccess, message, isError, twoFactor } =
-    useSelector((state) => state.auth);
+  const { isLoading, isLoggedIn, isSuccess, message, isError } = useSelector(
+    (state) => state.auth
+  );
 
   const {
     register,
@@ -41,16 +42,16 @@ const SignUpForm = () => {
     if (isSuccess && isLoggedIn) {
       navigate("/");
     }
-    if (isError && twoFactor) {
+    if (isError) {
       dispatch(sendLoginCode(email));
       navigate(`/loginWithCode/${email}`);
     }
 
     dispatch(RESET());
-  }, [isLoggedIn, isSuccess, dispatch, navigate, isError, twoFactor, email]);
+  }, [isLoggedIn, isSuccess, dispatch, navigate, isError, email]);
 
   const googleLogin = async (credentialResponse) => {
-    console.log(credentialResponse);
+    //console.log(credentialResponse);
     await dispatch(
       loginWithGoogle({ userToken: credentialResponse.credential })
     );

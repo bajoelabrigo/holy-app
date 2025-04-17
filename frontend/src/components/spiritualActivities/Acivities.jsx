@@ -48,10 +48,6 @@ function Activities() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-center mb-8">
-        Actividades Espirituales
-      </h1>
-
       {isLoading ? (
         <div className="text-center">Cargando actividades...</div>
       ) : (
@@ -59,7 +55,7 @@ function Activities() {
           {activities.map((activity) => (
             <div
               key={activity._id}
-              className="bg-base-100 shadow-lg rounded-lg p-4 space-y-1"
+              className="flex flex-col max-w-6xl bg-base-200 shadow-2xl rounded-lg p-4 space-y-1"
             >
               <h2 className="text-2xl font-semibold">{activity.title}</h2>
               <div className="flex items-center">

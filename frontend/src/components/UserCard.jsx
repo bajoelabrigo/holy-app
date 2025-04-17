@@ -9,7 +9,6 @@ const UserCard = ({ user, isConnection }) => {
     if (!window.confirm("Are you sure you want to delete connection")) return;
     removeConnection(user._id);
   };
-
   return (
     <div className="bg-base-100 text-base-content shadow p-4 flex flex-col items-center transition-all hover:shadow-md">
       <Link

@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { logout, RESET } from "../../redux/fectures/auth/authSlice";
 import { useNavbar } from "../../../hooks/useNavbar";
 import Themes from "../themes/Themes";
+import PostSearch from "../PostSearch";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -40,20 +41,13 @@ const Navbar = () => {
   return (
     <nav className="bg-base-100  text-base-content border-base-300 shadow-md sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex sm:justify-between justify-center items-center py-3">
+        <div className="flex sm:justify-between justify-center items-center py-3 flex-wrap-reverse gap-2 ">
           <div className="flex items-center">
             <Link to="/" className="gap-2 hidden sm:flex">
               <Wind size={32} className="text-gray-400" />
               <span className="font-bold text-2xl mr-6 ">HolyHolyHoly</span>
             </Link>
-            <label className="input input-bordered  w-full items-center gap-2 hidden md:flex ">
-              <input
-                type="text"
-                className="flex-1 grow"
-                placeholder="Search..."
-              />
-              <Search size={18} className="hidden" />
-            </label>
+            <PostSearch />
           </div>
 
           <div className="flex items-center gap-6  sm:gap-6">
@@ -68,7 +62,9 @@ const Navbar = () => {
                   className="flex flex-col items-center justify-center relative"
                 >
                   <Users size={20} />
-                  <span className="text-xs hidden md:block text-center">My Network</span>
+                  <span className="text-xs hidden md:block text-center">
+                    My Network
+                  </span>
                   {unreadConnectionRequestsCount > 0 && (
                     <span
                       className="absolute -top-2 -right-1 md:right-2 bg-blue-500 text-white text-xs 
@@ -109,13 +105,9 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link>
-             
 
-              <Themes/>
-              <Link
-                  to="/profile"
-                  className="flex flex-col items-center"
-                >
+                <Themes />
+                <Link to="/profile" className="flex flex-col items-center">
                   <Settings size={20} />
                   <span className="text-sm hidden md:block">Settings</span>
                 </Link>
@@ -127,7 +119,6 @@ const Navbar = () => {
                   <User size={20} />
                   <span className="text-sm hidden md:block">Me</span>
                 </Link>
-
 
                 <button
                   onClick={LogoutUser}

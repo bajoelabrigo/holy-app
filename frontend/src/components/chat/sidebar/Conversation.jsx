@@ -96,7 +96,7 @@ const Conversation = ({ conversation, lastIdx }) => {
                 isOnline ? "text-success" : "text-error"
               }`}
             >
-              {isOnline ? "online" : "offline"}
+              {!!isOnline ? "online" : "offline"}
             </p>
           </div>
           <p

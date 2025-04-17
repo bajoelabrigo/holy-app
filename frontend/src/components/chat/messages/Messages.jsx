@@ -6,11 +6,8 @@ import useGetMessages from "../../../../hooks/useGetMessages";
 
 import FileMessage from "../files/FileMessage";
 import { useSelector } from "react-redux";
-import useListenMessages from "../../../../hooks/useListenMessages";
 import TypingIndicator from "./typing";
-import useJoinConversation from "../../../../hooks/useConversationJoinSocket";
 import useConversation from "../../../../zustand/useConversation";
-import useTypingListener from "../../../../hooks/useTypingListener";
 import useChatListeners from "../../../../hooks/useChatListeners";
 
 const Messages = () => {
@@ -52,7 +49,7 @@ const Messages = () => {
               <Message message={message} />
             ) : null}
 
-            <div ref={lastMessageRef}></div>
+            <div ref={lastMessageRef} className="mb10"></div>
           </div>
         ))}
 
@@ -68,7 +65,7 @@ const Messages = () => {
       )}
 
       {/* 👇 Mensaje de typing */}
-      <div className="mb-2">
+      <div className="mb-20">
         {typingUser && <TypingIndicator name={typingUser} />}
       </div>
     </div>

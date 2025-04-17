@@ -13,11 +13,13 @@ import {
   getFeedPosts,
   getPostById,
   likePost,
+  searchPosts,
   updatePost,
 } from "../../controllers/media/postController.js";
 
 const router = express.Router();
 
+router.get("/search", trimRequest.all, protect, searchPosts);
 router.get("/", trimRequest.all, protect, getFeedPosts);
 router.post("/create", trimRequest.all, protect, createPost);
 router.delete("/delete/:id", protect, deletePost);

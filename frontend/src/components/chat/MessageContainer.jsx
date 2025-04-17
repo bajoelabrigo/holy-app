@@ -1,13 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NoChatSelected from "./NoChatSelected";
 import MessageInput from "./MessageInput";
 import Messages from "./messages/Messages";
 import useConversation from "../../../zustand/useConversation";
 import FilesPreview from "./preview/files/FilesPreview";
+import MessageHeader from "./MessageHeader";
+import { useSearchMessages } from "../../../hooks/useSearchMessages";
 
 const MessageContainer = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const { selectedConversation, setSelectedConversation, files } =
     useConversation();
+
+  const { data: searchData, isLoading: searching } = useSearchMessages({
+    query: searchTerm,
+    conversationId: selectedConversation?._id,
+    page: 1,
+  });
+
+  const searchResults = searchData?.results || [];
+
+  console.log("searchResults", searchResults)
 
   useEffect(() => {
     return () => setSelectedConversation(null);
@@ -19,63 +32,44 @@ const MessageContainer = () => {
         <NoChatSelected />
       ) : (
         <>
-          <div className="bg-base-200 flex justify-between items-center px-4 py-2 mb-2 rounded-r-md">
-            <div>
-              <span className="label-text">To: </span>
-              <span className=" font-bold">{selectedConversation?.name}</span>
-            </div>
-            {selectedConversation?.isGroup ? (
-              <div className="relative w-12 h-12">
-                <img
-                  src={
-                    selectedConversation?.participants?.[0]?.profilePicture ||
-                    "/profile.png"
-                  }
-                  className="absolute w-8 h-8 rounded-full border-2 border-white z-10 top-2 -left-14 object-cover"
-                />
-                <img
-                  src={
-                    selectedConversation?.participants?.[1]?.profilePicture ||
-                    "/profile.png"
-                  }
-                  className="absolute w-8 h-8 rounded-full border-2 border-white z-5  top-2 -left-10 object-cover"
-                />
-                <img
-                  src={
-                    selectedConversation?.participants?.[2]?.profilePicture ||
-                    "/profile.png"
-                  }
-                  className="absolute w-8 h-8 rounded-full border-2 border-white z-3  top-2 -left-6 object-cover"
-                />
-                <img
-                  src={
-                    selectedConversation?.participants?.[3]?.profilePicture ||
-                    "/profile.png"
-                  }
-                  className="absolute w-8 h-8 rounded-full border-2 border-white z-2  top-2 -left-2 object-cover"
-                />
-                <img
-                  src={
-                    selectedConversation?.participants?.[4]?.profilePicture ||
-                    "/profile.png"
-                  }
-                  className="absolute w-8 h-8 rounded-full border-2 border-white z-0  top-2 left-2 object-cover"
-                />
-              </div>
-            ) : (
-              <img
-                src={
-                  selectedConversation?.participants?.profilePicture ||
-                  "/avatar.png"
-                }
-                className="w-10 h-10 rounded-full object-cover"
-                alt="profile"
-              />
-            )}
-          </div>
+          <MessageHeader
+            selectedConversation={selectedConversation}
+            setSelectedConversation={setSelectedConversation}
+            onSearch={setSearchTerm}
+          />
 
           {files.length > 0 ? (
             <FilesPreview />
+          ) : searchTerm ? (
+            <div className="flex-1 overflow-y-auto px-4">
+              {searching ? (
+                <p className="text-center mt-4">Buscando mensajes...</p>
+              ) : searchResults?.length > 0 ? (
+                searchResults?.map((msg) => (
+                  <div
+                    key={msg._id}
+                    className="p-2 bg-base-100 rounded mb-2 shadow flex items-center gap-6"
+                  >
+                    <img
+                      src={msg.sender.profilePicture}
+                      alt={msg.sender.profilePicture}
+                      className="size-10 rounded-full overflow-hidden object-cover"
+                    />
+                    <div>
+                      <p className="text-sm text-info">
+                        {msg.sender.name} •{" "}
+                        {new Date(msg.createdAt).toLocaleString()}
+                      </p>
+                      <p>{msg.message}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center mt-4 text-gray-500">
+                  No se encontraron mensajes.
+                </p>
+              )}
+            </div>
           ) : (
             <>
               <Messages />

@@ -12,7 +12,8 @@ export const useConnectionRequest = () => {
       axiosInstance.put(`/connections/accept/${requestId}`),
     onSuccess: () => {
       toast.success("Connection Request accepted");
-      queryClient.invalidateQueries({ queryKey: ["connectionRequests",] });
+      queryClient.invalidateQueries({ queryKey: ["connectionRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["connections"] });
     },
     onError: (error) => {
       const response =
@@ -30,7 +31,12 @@ export const useConnectionRequest = () => {
       axiosInstance.put(`/connections/reject/${requestId}`),
     onSuccess: () => {
       toast.success("Connection Reject accepted");
-      queryClient.invalidateQueries({ queryKey: ["connectionRequests", user?._id] });
+      queryClient.invalidateQueries({
+        queryKey: ["connectionRequests", user?._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["connections"],
+      });
     },
     onError: (error) => {
       const response =
@@ -59,6 +65,9 @@ export const useConnectionRequest = () => {
       toast.success("Connection remove successfully");
       queryClient.invalidateQueries({
         queryKey: ["connectionRequests", user._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["connections"],
       });
     },
     onError: (error) => {

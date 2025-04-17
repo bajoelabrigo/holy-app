@@ -46,7 +46,7 @@ export const SocketContextProvider = ({ children }) => {
       });
 
       socket.on("getOnlineUsers", (users) => {
-        console.log("📡 Usuarios online recibidos:", users);
+        //console.log("📡 Usuarios online recibidos:", users);
         dispatch(SET_ONLINE_USERS(users));
       });
 

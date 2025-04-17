@@ -9,9 +9,12 @@ import {
   Book,
 } from "lucide-react";
 import { Church, HandsPraying } from "@phosphor-icons/react";
+import { useConnectionRequest } from "../../hooks/useConnectionRequest";
 
 export default function Sidebar({ user }) {
   const imgUrl = user?.profilePicture?.toString();
+
+  const { connections } = useConnectionRequest();
 
   return (
     <div className="bg-base-100 text-base-content rounded-lg shadow">
@@ -34,8 +37,8 @@ export default function Sidebar({ user }) {
           </button>
         </Link>
         <p className="text-info mt-2">{user?.headline}</p>
-        <p className="text-secondary text-xs">
-          {user?.connections?.length} connections
+        <p className="text-secondary text-xs font-semibold">
+          {connections?.data?.length} connections
         </p>
       </div>
       <div className="border-t border-base-100 p-4">

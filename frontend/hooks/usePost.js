@@ -1,8 +1,12 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getRecommendedUsers } from "./PostService";
 import { axiosInstance } from "../src/lib/axios";
+import { useLocation } from "react-router-dom";
 
 export const usePost = () => {
+  const location = useLocation();
+  const isOnHomePage = location.pathname === "/";
+
   // 1. Obtener usuarios recomendados
   const { data: recommendedUsers } = useQuery({
     queryKey: ["recommendedUsers"],
@@ -37,7 +41,8 @@ export const usePost = () => {
       //console.log("🔁 Próxima página:", nextPage);
       return nextPage;
     },
-    refetchInterval: 5000, // cada 10 segundos
+    enabled: isOnHomePage, //Solo activa cuando estás en la página de posts
+    refetchInterval: isOnHomePage ? 10000 : false, // Solo refetch si estás en home
   });
 
   return {

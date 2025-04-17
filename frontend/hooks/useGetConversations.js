@@ -12,7 +12,7 @@ const useGetConversations = () => {
       setLoading(true);
       try {
         const res = await axiosInstance.get("/messages/conversations");
-        console.log("👉 Conversaciones desde backend:", res.data); // <-- Agregado aquí
+        //console.log("👉 Conversaciones desde backend:", res.data); // <-- Agregado aquí
 
         const updatedConversations = res.data.map((conv) => {
           if (conv.isGroup) {

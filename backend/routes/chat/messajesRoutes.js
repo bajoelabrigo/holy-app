@@ -8,12 +8,15 @@ import {
   editMessage,
   getMessages,
   getUsersForSidebar,
+  searchMessages,
   sendMessage,
 } from "../../controllers/chat/messageController.js";
 
 import { getUserConversations } from "../../controllers/chat/getUserConversations.js";
 
 const router = express.Router();
+
+router.get("/search", trimRequest.all, protect, searchMessages);
 
 router.get("/users", trimRequest.all, protect, getUsersForSidebar);
 
@@ -33,6 +36,12 @@ router.put("/message/:messageId", trimRequest.all, protect, editMessage);
 router.delete("/message/:messageId", trimRequest.all, protect, deleteMessage);
 
 // POST /messages/conversation/:receiverId
-router.post("/conversation/:receiverId", protect, createOneToOneConversation);
+router.post(
+  "/conversation/:receiverId",
+  trimRequest.all,
+  protect,
+  createOneToOneConversation
+);
+
 
 export default router;

@@ -15,9 +15,9 @@ const useIsConversationOnline = (conversation) => {
     onlineUsers.includes(String(id))
   );
 
-  console.log("participantsIds", participantIds);
-  console.log("OnlineUsers", onlineUsers);
-  console.log("✅ ¿Alguien online?:", isOnline);
+  // console.log("participantsIds", participantIds);
+  // console.log("OnlineUsers", onlineUsers);
+  // console.log("✅ ¿Alguien online?:", isOnline);
 
   return isOnline;
 };

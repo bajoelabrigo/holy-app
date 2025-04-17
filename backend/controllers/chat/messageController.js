@@ -3,6 +3,8 @@ import Conversation from "../../models/chat/conversationModel.js";
 import Message from "../../models/chat/messageModel.js";
 import User from "../../models/userModel.js";
 import Group from "../../models/chat/groupModel.js";
+import mongoose from "mongoose";
+
 
 // GET - Usuarios para la barra lateral
 export const getUsersForSidebar = async (req, res) => {
@@ -227,5 +229,108 @@ export const createOneToOneConversation = async (req, res) => {
   } catch (error) {
     console.error("Error en crear conversacion 1 a 1:", error.message);
     res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+export const searchMessages = async (req, res) => {
+  try {
+    const { query, conversationId, page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    if (!query) return res.status(400).json({ message: "Query vacía" });
+
+    const regex = new RegExp(query, "i");
+
+    const matchStage = {
+      $and: [],
+    };
+
+    // Filtra por conversación si se pasa
+    if (conversationId) {
+      matchStage.$and.push({
+        conversationId: new mongoose.Types.ObjectId(conversationId),
+      });
+    }
+
+    // Filtros de texto
+    matchStage.$and.push({
+      $or: [
+        { message: regex },
+        { "sender.name": regex },
+        { "receiver.name": regex },
+        { "files.name": regex },
+      ],
+    });
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "senderId",
+          foreignField: "_id",
+          as: "sender",
+        },
+      },
+      { $unwind: "$sender" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "receiverId",
+          foreignField: "_id",
+          as: "receiver",
+        },
+      },
+      {
+        $unwind: {
+          path: "$receiver",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: matchStage,
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $skip: parseInt(skip),
+      },
+      {
+        $limit: parseInt(limit),
+      },
+    ];
+
+    const messages = await Message.aggregate(pipeline);
+
+    const total = await Message.aggregate([
+      ...pipeline.slice(0, -2), // sin skip y limit
+      { $count: "count" },
+    ]);
+
+    const count = total[0]?.count || 0;
+    const totalPages = Math.ceil(count / limit);
+
+    // Buscar coincidencias por nombre de grupo (si no hay conversationId)
+    let groupMatches = [];
+    if (!conversationId) {
+      groupMatches = await Conversation.find({
+        isGroup: true,
+        name: { $regex: regex },
+      })
+        .populate("participants", "name")
+        .select("name participants")
+        .limit(5);
+    }
+
+    res.status(200).json({
+      results: messages,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages,
+      groupMatches,
+    });
+  } catch (error) {
+    console.error("Error en searchMessages:", error.message);
+    res.status(500).json({ message: "Error del servidor" });
   }
 };

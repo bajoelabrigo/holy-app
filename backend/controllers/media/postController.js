@@ -219,3 +219,35 @@ export const updatePost = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// GET /api/posts/search?query=palabra
+
+export const searchPosts = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim() === "") {
+      return res.status(400).json({ message: "Consulta vacía" });
+    }
+
+    const regex = new RegExp(query, "i");
+
+    const posts = await Post.find({
+      $or: [{ content: regex }, { "comments.content": regex }],
+    })
+      .populate("author", "name username profilePicture")
+      .sort({ createdAt: -1 });
+
+    const filtered = posts.filter(
+      (post) =>
+        post.author?.name?.toLowerCase().includes(query.toLowerCase()) ||
+        post.author?.username?.toLowerCase().includes(query.toLowerCase()) ||
+        regex.test(post.content)
+    );
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error("Error en búsqueda:", error.message);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
