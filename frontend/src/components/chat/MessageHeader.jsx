@@ -4,6 +4,15 @@ import { Search } from "lucide-react";
 const MessageHeader = ({ selectedConversation, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.trim() === "") {
+      // 🔄 Si está vacío, vuelve a la ruta base (sin search)
+    }
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (onSearch && searchTerm.trim()) {
@@ -55,7 +64,7 @@ const MessageHeader = ({ selectedConversation, onSearch }) => {
           placeholder="Buscar mensajes..."
           className="input input-sm input-bordered flex-1"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleChange}
         />
         <button type="submit" className="btn btn-sm btn-ghost">
           <Search size={18} />

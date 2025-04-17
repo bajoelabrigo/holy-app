@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { logout, RESET } from "../../redux/fectures/auth/authSlice";
 import { useNavbar } from "../../../hooks/useNavbar";
 import Themes from "../themes/Themes";
+import PostSearch from "../PostSearch";
 
 const NavbarChat = () => {
   const dispatch = useDispatch();
@@ -46,14 +47,7 @@ const NavbarChat = () => {
               <MessageSquare size={32} className="text-gray-400" />
               <span className="font-bold text-2xl mr-6 ">HollyChat</span>
             </div>
-            <label className="input input-bordered  w-full items-center gap-2 hidden md:flex ">
-              <input
-                type="text"
-                className="flex-1 grow"
-                placeholder="Search..."
-              />
-              <Search size={18} className="hidden" />
-            </label>
+            <PostSearch />
           </div>
 
           <div className="flex items-center gap-6  sm:gap-6">

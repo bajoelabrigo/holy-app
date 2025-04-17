@@ -10,7 +10,7 @@ import TypingIndicator from "./typing";
 import useConversation from "../../../../zustand/useConversation";
 import useChatListeners from "../../../../hooks/useChatListeners";
 
-const Messages = () => {
+const Messages = ({ scrollToId }) => {
   const { loading, messages } = useGetMessages();
   const { user } = useSelector((state) => state.auth);
   const { selectedConversation, typingStatus } = useConversation();
@@ -18,13 +18,42 @@ const Messages = () => {
 
   useChatListeners();
 
+  useEffect(() => {
+    if (scrollToId) {
+      const target = document.getElementById(`msg-${scrollToId}`);
+      if (target) {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        target.classList.add("bg-yellow-100", "transition-colors");
+
+        const timeout = setTimeout(() => {
+          target.classList.remove("bg-yellow-100");
+        }, 3000);
+
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [scrollToId]);
+
+  useEffect(() => {
+    if (scrollToId) {
+      const el = document.getElementById(`msg-${scrollToId}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [scrollToId]);
+
   // Scroll automático al último mensaje
   const lastMessageRef = useRef();
   useEffect(() => {
-    setTimeout(() => {
-      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  }, [messages]);
+    if (!scrollToId) {
+      setTimeout(() => {
+        lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [messages, scrollToId]);
 
   return (
     <div className="px-4 flex-1 overflow-auto">
@@ -46,7 +75,7 @@ const Messages = () => {
 
             {/* Texto del mensaje */}
             {message?.message?.length > 0 ? (
-              <Message message={message} />
+              <Message message={message} scrollToId={scrollToId} />
             ) : null}
 
             <div ref={lastMessageRef} className="mb10"></div>
